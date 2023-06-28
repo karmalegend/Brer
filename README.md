@@ -49,6 +49,8 @@ Brer will automatically scan all referencing assemblies for EventListeners.
 
 Once a class is annoted with the ```EventListener``` attribute it will further scan the class for ```Handlers```.
 
+**NOTE:** wildcards are currently not (officially) supported.
+
 ```C#
 [EventListener]
 public class MyEventHandler{
