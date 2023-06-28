@@ -1,13 +1,13 @@
 using System;
 
-namespace Brer.Attributes
+namespace Brer.Attributes;
+
+public class HandlerAttribute : Attribute
 {
-    public class HandlerAttribute : Attribute
+    public string Topic { get; }
+
+    public HandlerAttribute(string topic)
     {
-        public string Topic { get; }
-        public HandlerAttribute(string topic)
-        {
-            Topic = topic;
-        }
+        Topic = topic;
     }
 }

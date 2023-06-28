@@ -23,9 +23,9 @@ namespace MVCListenerHostedService
             services.AddControllersWithViews();
             services.AddScoped<ITestInjection,TestInjection>();
             services.UseBrer(
-                new BrerOptionsBuilder().WithAddress(BrerOptionsBuilder.localHost, BrerOptionsBuilder.defaultPort)
-                    .WithPassWord(BrerOptionsBuilder.defaultLogin)
-                    .WithUserName(BrerOptionsBuilder.defaultLogin)
+                new BrerOptionsBuilder().WithAddress(BrerOptionsBuilder.LocalHost, BrerOptionsBuilder.DefaultPort)
+                    .WithPassWord(BrerOptionsBuilder.DefaultLogin)
+                    .WithUserName(BrerOptionsBuilder.DefaultLogin)
                     .WithExchange("MyExchange")
                     .WithQueueName("MyQueue")
                     .Build()

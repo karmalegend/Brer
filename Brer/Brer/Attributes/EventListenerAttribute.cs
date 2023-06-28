@@ -1,8 +1,7 @@
 using System;
 
-namespace Brer.Attributes
+namespace Brer.Attributes;
+
+public class EventListenerAttribute : Attribute
 {
-    public class EventListenerAttribute : Attribute
-    {
-    }
 }

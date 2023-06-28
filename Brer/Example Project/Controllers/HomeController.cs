@@ -18,7 +18,8 @@ namespace MVCListenerHostedService.Controllers
         private readonly IBrerPublisher _brerPublisher;
         private readonly ITestInjection _testInjection;
 
-        public HomeController(ILogger<HomeController> logger, IBrerPublisher brerPublisher,ITestInjection testInjection)
+        public HomeController(ILogger<HomeController> logger, IBrerPublisher brerPublisher,
+            ITestInjection testInjection)
         {
             _logger = logger;
             _brerPublisher = brerPublisher;
@@ -33,12 +34,12 @@ namespace MVCListenerHostedService.Controllers
                 KlantNummer = 101,
                 KlantNaam = "Karina van Irak",
             };
-            
+
             _brerPublisher.Publish(topic, evt);
             return View();
         }
 
-        [Handler(topic:"MVM.Klantbeheer.KlantGeregistreerd")]
+        [Handler(topic: "MVM.Klantbeheer.KlantGeregistreerd")]
         public async Task Handle(KlantGeregistreerdEvent evt)
         {
             Console.WriteLine(_testInjection.TestInjectionString());
@@ -50,16 +51,14 @@ namespace MVCListenerHostedService.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
-    
-    
+
+
     public class KlantGeregistreerdEvent
     {
         public int KlantNummer { get; set; }
         public string KlantNaam { get; set; }
     }
-
-    
 }

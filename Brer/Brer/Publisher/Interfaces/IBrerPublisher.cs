@@ -1,7 +1,6 @@
-﻿namespace Brer.Publisher.Interfaces
+﻿namespace Brer.Publisher.Interfaces;
+
+public interface IBrerPublisher
 {
-    public interface IBrerPublisher
-    { 
-        void Publish<T>(string topic, T obj); 
-    }
+    void Publish<T>(string topic, T obj);
 }
