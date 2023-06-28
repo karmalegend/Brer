@@ -52,9 +52,6 @@ public sealed class BrerListener : IBrerListener
     {
         _context.Logger.LogInformation("Received event on exchange {ex} with routingkey {key}. Consumertag : {ct}",
             e.Exchange, e.RoutingKey, e.ConsumerTag);
-
-        var sendObj = sender as EventingBasicConsumer;
-        var channel = sendObj?.Model; // if this results in null we want it to break.
         try
         {
             var topic = e.RoutingKey;
@@ -62,7 +59,7 @@ public sealed class BrerListener : IBrerListener
             dispatcherTask.Wait();
 
             //only acknowledge when dispatch has successfully finished.
-            channel?.BasicAck(e.DeliveryTag, false);
+            _channel?.BasicAck(e.DeliveryTag, false);
             _context.Logger.LogInformation("Handled event on exchange {ex} with routingkey {key}. Consumertag : {ct}",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
         }
@@ -73,7 +70,7 @@ public sealed class BrerListener : IBrerListener
             // this will infinitely add the message back to the queue.
             // this is ONLY meant to happen when a service breaking exception occurs.
             // rendering it unable to re-pop items from the queue.
-            channel?.BasicNack(e.DeliveryTag, false, true);
+            _channel?.BasicNack(e.DeliveryTag, false, true);
             _context.Logger.LogError(exception,
                 "Failed to handle event on exchange {ex} with routingkey {key}. Consumertag : {ct}",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
