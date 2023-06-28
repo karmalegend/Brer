@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brer", "Brer\Brer.csproj", "{3B844DA2-B394-4D65-802B-0CFA2B7C5BA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCListenerHostedService", "MVCListenerHostedService\MVCListenerHostedService.csproj", "{7D88050E-01E5-4808-BB33-079DF897F420}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B844DA2-B394-4D65-802B-0CFA2B7C5BA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B844DA2-B394-4D65-802B-0CFA2B7C5BA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B844DA2-B394-4D65-802B-0CFA2B7C5BA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B844DA2-B394-4D65-802B-0CFA2B7C5BA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F3F35A-03EF-4391-807B-4ACD5380A446}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F3F35A-03EF-4391-807B-4ACD5380A446}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F3F35A-03EF-4391-807B-4ACD5380A446}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F3F35A-03EF-4391-807B-4ACD5380A446}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9158727D-6B09-4D95-B405-FEC76522BD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9158727D-6B09-4D95-B405-FEC76522BD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9158727D-6B09-4D95-B405-FEC76522BD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9158727D-6B09-4D95-B405-FEC76522BD48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D88050E-01E5-4808-BB33-079DF897F420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D88050E-01E5-4808-BB33-079DF897F420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D88050E-01E5-4808-BB33-079DF897F420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D88050E-01E5-4808-BB33-079DF897F420}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
