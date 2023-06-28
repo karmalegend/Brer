@@ -40,6 +40,7 @@ public class BrerContext : IBrerContext
         if (_disposed) return;
         if (disposing)
         {
+            Connection?.Close();
             Connection?.Dispose();
         }
 
