@@ -1,6 +1,8 @@
 # Brer
 
-A rabbitMQ library for ASP.NET
+A rabbitMQ library for ASP.NET.
+
+__Special thanks to Marco Pil__
 
 - [Brer](#brer)
 - [How do i use Brer?](#how-do-i-use-brer)
