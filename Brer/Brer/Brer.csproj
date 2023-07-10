@@ -2,8 +2,18 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <PackageVersion>1.1</PackageVersion>
+        <PackageVersion>0.1</PackageVersion>
         <Nullable>enable</Nullable>
+        <Title>Brer</Title>
+        <Authors>Karmalegend</Authors>
+        <Description>Brer is a simple wrapper for RABBITMQ using ASP.NET based clients. </Description>
+        <PackageProjectUrl>https://github.com/karmalegend/Brer</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/karmalegend/Brer/blob/main/LICENSE</PackageLicenseUrl>
+        <license>https://github.com/karmalegend/Brer/blob/main/LICENSE</license>
+        <RepositoryUrl>https://github.com/karmalegend/Brer</RepositoryUrl>
+        <RepositoryType>Github</RepositoryType>
+        <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,6 +22,10 @@
       <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="7.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
