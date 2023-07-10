@@ -25,7 +25,7 @@ public class BrerPublisher : IBrerPublisher
         );
 
         _context.Logger.LogInformation("Publishing event of topic {top} with object {tobj} to exchange {ex}",
-            topic, obj.ToString(), _context.BrerOptions.ExchangeName);
+            topic, obj?.ToString(), _context.BrerOptions.ExchangeName);
 
         byte[] body = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(obj));
 

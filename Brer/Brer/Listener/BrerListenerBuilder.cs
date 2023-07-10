@@ -51,7 +51,7 @@ public class BrerListenerBuilder : IBrerListenerBuilder
             if (handlerAttr == null) continue;
 
             var parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
-            var dispatcher = new ListenerDispatcher(type, method, parameterType, _serviceProvider);
+            var dispatcher = new ListenerDispatcher(type, method, parameterType!, _serviceProvider);
 
             _context.Logger.LogInformation(
                 "Subscribing {type} {method} with param of type {parameter} to {handlerAttr}",
@@ -82,7 +82,7 @@ public class BrerListenerBuilder : IBrerListenerBuilder
     {
         var thisAssemblyName = GetType().Assembly.FullName;
 
-        var result = from library in DependencyContext.Default.RuntimeLibraries
+        var result = from library in DependencyContext.Default?.RuntimeLibraries
             where library.Dependencies.Any(d => thisAssemblyName!.StartsWith(d.Name))
             select Assembly.Load(new AssemblyName(library.Name));
         return result;

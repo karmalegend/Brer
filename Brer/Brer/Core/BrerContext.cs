@@ -7,7 +7,8 @@ namespace Brer.Core;
 
 public class BrerContext : IBrerContext
 {
-    public IConnection? Connection { get; set; }
+    private readonly IConnection? _connection;
+    public IConnection Connection => _connection ?? throw new NullReferenceException("Failed to establish a connection");
     public BrerOptions BrerOptions { get; set; }
     public ILogger Logger { get; init; }
     private static readonly object LockObject = new();
@@ -19,10 +20,10 @@ public class BrerContext : IBrerContext
         BrerOptions = options;
         lock (LockObject)
         {
-            if (Connection == null)
+            if (_connection == null)
             {
-                Connection = options.Factory.CreateConnection();
-                using var channel = Connection.CreateModel();
+                _connection = options.Factory.CreateConnection();
+                using var channel = _connection.CreateModel();
                 channel.ExchangeDeclare(options.ExchangeName, ExchangeType.Topic);
                 Logger.LogInformation("Creating connection with {BrerOptions}", BrerOptions);
             }
@@ -40,8 +41,8 @@ public class BrerContext : IBrerContext
         if (_disposed) return;
         if (disposing)
         {
-            Connection?.Close();
-            Connection?.Dispose();
+            _connection?.Close();
+            _connection?.Dispose();
         }
 
         _disposed = true;
