@@ -3,7 +3,7 @@ using Brer.Listener.Runtime;
 
 namespace Brer.Listener.Interfaces;
 
-public interface IBrerListenerBuilder
+internal interface IBrerListenerBuilder
 {
     BrerListenerBuilder Subscribe<T>(string topic, Action<T> callback);
     BrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher);

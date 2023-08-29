@@ -7,7 +7,7 @@ using RabbitMQ.Client;
 
 namespace Brer.Publisher;
 
-public class BrerPublisher : IBrerPublisher
+internal class BrerPublisher : IBrerPublisher
 {
     private readonly IBrerContext _context;
 

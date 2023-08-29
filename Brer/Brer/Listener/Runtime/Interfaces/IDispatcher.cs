@@ -2,7 +2,7 @@
 
 namespace Brer.Listener.Runtime.Interfaces;
 
-public interface IDispatcher
+internal interface IDispatcher
 {
     void Dispatch(BasicDeliverEventArgs e);
 }

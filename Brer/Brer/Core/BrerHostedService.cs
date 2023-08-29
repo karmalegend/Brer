@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Brer.Core;
 
-public class BrerHostedService : IHostedService
+internal class BrerHostedService : IHostedService
 {
     private readonly IBrerListenerBuilder _builder;
     private IBrerListener? _listener;

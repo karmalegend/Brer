@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brer", "Brer\Brer.csproj", "{3B844DA2-B394-4D65-802B-0CFA2B7C5BA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrerTests", "BrerTests\BrerTests.csproj", "{98070C1C-5277-4717-A87D-1CBCB99DDF4C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brer.Tests", "Brer.Tests\Brer.Tests.csproj", "{98070C1C-5277-4717-A87D-1CBCB99DDF4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

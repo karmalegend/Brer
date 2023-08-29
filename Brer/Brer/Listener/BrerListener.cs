@@ -10,7 +10,7 @@ using RabbitMQ.Client.Events;
 
 namespace Brer.Listener;
 
-public sealed class BrerListener : IBrerListener
+internal sealed class BrerListener : IBrerListener
 {
     private readonly IBrerContext _context;
     private readonly Dictionary<string, IDispatcher> _dispatchers;

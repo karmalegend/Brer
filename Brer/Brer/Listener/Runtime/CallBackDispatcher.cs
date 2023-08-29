@@ -6,7 +6,7 @@ using RabbitMQ.Client.Events;
 
 namespace Brer.Listener.Runtime;
 
-public class CallBackDispatcher<T> : IDispatcher
+internal class CallBackDispatcher<T> : IDispatcher
 {
     private readonly Action<T> _callback;
 

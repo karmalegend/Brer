@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Brer.Listener;
 
-public class BrerListenerBuilder : IBrerListenerBuilder
+internal class BrerListenerBuilder : IBrerListenerBuilder
 {
     private readonly IBrerContext _context;
     private readonly Dictionary<string, IDispatcher> _dispatchers;
