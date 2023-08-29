@@ -43,24 +43,25 @@ public class BrerOptionsBuilder
         return this;
     }
 
-    public BrerOptionsBuilder WithPassWord(string password)
+    public BrerOptionsBuilder WithPassword(string password)
     {
         RabbitMqPass = password;
         return this;
     }
 
-    public BrerOptionsBuilder ReadFromEnviromentVariables()
+    public BrerOptionsBuilder ReadFromEnvironmentVariables()
     {
-        Host = Environment.GetEnvironmentVariable("BrerHostName") ?? throw new ArgumentNullException(Host);
+        Host = Environment.GetEnvironmentVariable("BrerHostName") ?? throw new ArgumentNullException(nameof(Host));
         Port = Convert.ToInt32(Environment.GetEnvironmentVariable("BrerPort") ??
                                throw new ArgumentNullException(nameof(Port)));
         ExchangeName = Environment.GetEnvironmentVariable("BrerExchangeName") ??
-                       throw new ArgumentNullException(ExchangeName);
-        QueueName = Environment.GetEnvironmentVariable("BrerQueueName") ?? throw new ArgumentNullException(QueueName);
+                       throw new ArgumentNullException(nameof(ExchangeName));
+        QueueName = Environment.GetEnvironmentVariable("BrerQueueName") ??
+                    throw new ArgumentNullException(nameof(QueueName));
         RabbitMqUser = Environment.GetEnvironmentVariable("BrerUserName") ??
-                       throw new ArgumentNullException(RabbitMqUser);
+                       throw new ArgumentNullException(nameof(RabbitMqUser));
         RabbitMqPass = Environment.GetEnvironmentVariable("BrerPassword") ??
-                       throw new ArgumentNullException(RabbitMqPass);
+                       throw new ArgumentNullException(nameof(RabbitMqPass));
         return this;
     }
 

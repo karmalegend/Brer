@@ -14,9 +14,9 @@ public static class ExtensionMethods
     public static IServiceCollection UseBrer(this IServiceCollection services,
         BrerOptions options)
     {
-        services.AddSingleton<IBrerContext>(opt =>
+        services.AddSingleton<IBrerContext>(serviceProvider =>
         {
-            var logger = opt.GetRequiredService<ILogger<BrerContext>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<BrerContext>>();
             return new BrerContext(options, logger);
         });
         services.AddTransient<IBrerPublisher, BrerPublisher>();
