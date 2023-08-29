@@ -25,7 +25,7 @@ In short one must register the Brer services as follows:
 ```C#
 services.UseBrer(
     new BrerOptionsBuilder().WithAddress(BrerOptionsBuilder.localHost, BrerOptionsBuilder.defaultPort)
-        .WithPassWord(BrerOptionsBuilder.defaultLogin)
+        .WithPassword(BrerOptionsBuilder.defaultLogin)
         .WithUserName(BrerOptionsBuilder.defaultLogin)
         .WithExchange("MyExchange")
         .WithQueueName("MyQueue")
