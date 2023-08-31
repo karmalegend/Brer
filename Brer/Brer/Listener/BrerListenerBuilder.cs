@@ -26,6 +26,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         _serviceProvider = serviceProvider;
     }
 
+    [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
     public BrerListenerBuilder Subscribe<T>(string topic, Action<T> callback)
     {
         _context.Logger.LogInformation("Subscribing {Topic} to {Callback}", topic, callback);
@@ -33,7 +34,8 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         Dispatchers.Add(topic, dispatcher);
         return this;
     }
-
+    
+    [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
     public BrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher)
     {
         _context.Logger.LogInformation("Subscribing {Topic} to {Dispatcher}", topic, dispatcher);
