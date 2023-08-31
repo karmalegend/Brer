@@ -15,13 +15,14 @@ namespace Brer.Listener;
 internal class BrerListenerBuilder : IBrerListenerBuilder
 {
     private readonly IBrerContext _context;
-    private readonly Dictionary<string, IDispatcher> _dispatchers;
     private readonly IServiceProvider _serviceProvider;
+    
+    public readonly Dictionary<string, IDispatcher> Dispatchers;
 
     public BrerListenerBuilder(IBrerContext context, IServiceProvider serviceProvider)
     {
         _context = context;
-        _dispatchers = new Dictionary<string, IDispatcher>();
+        Dispatchers = new Dictionary<string, IDispatcher>();
         _serviceProvider = serviceProvider;
     }
 
@@ -29,14 +30,14 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
     {
         _context.Logger.LogInformation("Subscribing {Topic} to {Callback}", topic, callback);
         var dispatcher = new CallBackDispatcher<T>(callback);
-        _dispatchers.Add(topic, dispatcher);
+        Dispatchers.Add(topic, dispatcher);
         return this;
     }
 
     public BrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher)
     {
-        _context.Logger.LogInformation("Subscribing {Topic} to {Dispatcher}", topic);
-        _dispatchers.Add(topic, dispatcher);
+        _context.Logger.LogInformation("Subscribing {Topic} to {Dispatcher}", topic, dispatcher);
+        Dispatchers.Add(topic, dispatcher);
         return this;
     }
 
@@ -57,7 +58,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
                 "Subscribing {type} {method} with param of type {parameter} to {handlerAttr}",
                 type.Name, method.Name, parameterType?.Name, handlerAttr.Topic);
 
-            _dispatchers.Add(handlerAttr.Topic, dispatcher);
+            Dispatchers.Add(handlerAttr.Topic, dispatcher);
         }
 
         return this;
@@ -69,12 +70,17 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         foreach (var assembly in referencedAssemblies)
         {
             foreach (var type in assembly.GetTypes())
-            {
                 Subscribe(type);
-            }
         }
 
         return this;
+    }
+
+
+    public BrerListener Build()
+    {
+        var listener = new BrerListener(_context, Dispatchers);
+        return listener;
     }
 
 
@@ -86,12 +92,5 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
             where library.Dependencies.Any(d => thisAssemblyName!.StartsWith(d.Name))
             select Assembly.Load(new AssemblyName(library.Name));
         return result;
-    }
-
-
-    public BrerListener Build()
-    {
-        var listener = new BrerListener(_context, _dispatchers);
-        return listener;
     }
 }
