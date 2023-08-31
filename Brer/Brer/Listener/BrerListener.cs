@@ -31,7 +31,7 @@ internal sealed class BrerListener : IBrerListener
         _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false);
         foreach (var topic in Topics)
         {
-            _context.Logger.LogInformation("Start Listening on queue {q}, exchange {exh}, topic {top} ",
+            _context.Logger.LogInformation("Start Listening on queue {q}, exchange {exh}, topic {top}",
                 _context.BrerOptions.QueueName, _context.BrerOptions.ExchangeName, topic);
             _channel.QueueBind(queue: _context.BrerOptions.QueueName, exchange: _context.BrerOptions.ExchangeName,
                 routingKey: topic);

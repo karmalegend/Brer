@@ -26,6 +26,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Brer\Brer.csproj" />
+
     </ItemGroup>
 
 

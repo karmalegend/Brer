@@ -1,10 +1,8 @@
-using System;
 using Brer.Core;
 using BrerTests.Helpers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ReceivedExtensions;
 using RabbitMQ.Client;
 using Xunit;
 
