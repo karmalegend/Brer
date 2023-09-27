@@ -53,11 +53,11 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
 
             if (handlerAttr == null) continue;
 
-            var parameterType = method.GetParameters().FirstOrDefault()?.ParameterType;
-            var dispatcher = new ListenerDispatcher(type, method, parameterType!, _serviceProvider);
+            var parameterType = method.GetParameters()[0].ParameterType;
+            var dispatcher = new ListenerDispatcher(type, method, parameterType, _serviceProvider);
 
             _context.Logger.LogInformation(
-                "Subscribing {type} {method} with param of type {parameter} to {handlerAttr}",
+                "Subscribing {Type} {Method} with param of type {Parameter} to {HandlerAttr}",
                 type.Name, method.Name, parameterType?.Name, handlerAttr.Topic);
 
             Dispatchers.Add(handlerAttr.Topic, dispatcher);
