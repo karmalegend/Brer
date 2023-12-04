@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using Brer.Core.Interfaces;
 using Brer.Listener;
 using Brer.Listener.Runtime;
@@ -100,5 +98,85 @@ public class BrerListenerBuilderTest
     // case being DiscoverAndSubscribeAll
     // 
     // public void Subscribe_ShouldThrowException_WhenHandlerHasNoParameters()
+    
+    [Fact]
+    public void Subscribe_ShouldSubscribeTypeWithHandlers_WhenTypeHasEventListenerAttributeAndHandlerAttributes()
+    {
+        // Arrange
+        var mockBrerContext = Substitute.For<IBrerContext>();
+        var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
+        var listenerWithHandlers = new BrerEventListenerWithHandlersMock().GetType();
+        mockBrerContext.Logger.Returns(mockLogger);
+
+       
+
+        var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
+
+        // Act
+        sut.Subscribe(listenerWithHandlers);
+
+        // Assert
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithHandlersMock");
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithHandlersMock EventHandler with param of type Object to MyUnitTestTopic");
+        
+        sut.Dispatchers.Keys.Count.Should().Be(1);
+        sut.Dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
+    }
+
+    [Fact]
+    public void DiscoverAndSubscribeAll_ShouldRegisterAndSubscribeClasses_WhenTheyHaveTheEventListenerAttribute()
+    {
+        // Arrange
+        var mockBrerContext = Substitute.For<IBrerContext>();
+        var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
+
+        mockBrerContext.Logger.Returns(mockLogger); 
+        
+        var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
+        
+        // Act
+        sut.DiscoverAndSubscribeAll();
+
+        // Assert
+        // Listener without handlers class
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithoutHandlersMock");
+        
+        // Initial Listener with handler class.
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithHandlersMock");
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithHandlersMock EventHandler with param of type Object to MyUnitTestTopic");
+        
+        // Additional Listener with handler class
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing ExtraBrerEventListenerWithHandlersMock");
+        mockLogger.Received(1).Log(LogLevel.Information, "Subscribing ExtraBrerEventListenerWithHandlersMock ExtraEventHandler with param of type Object to MyExtraUnitTestTopic");
+        
+        sut.Dispatchers.Keys.Count.Should().Be(2);
+        sut.Dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
+        sut.Dispatchers["MyExtraUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
+    }
+
+    [Fact]
+    public void Build_ShouldReturnABrerListener_WhenCalled()
+    {
+        // Arrange
+        var mockBrerContext = Substitute.For<IBrerContext>();
+        var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
+        mockBrerContext.Logger.Returns(mockLogger);
+
+
+        
+        var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
+        
+        // we just need a random Action
+        Action<BrerListenerBuilder> callback = _ => { };
+        
+        // Act
+        sut.Subscribe("MyTestTopic", callback); // ease of testing. could be refactored to use automatic discovery
+        sut.Subscribe("MyTestTopic2", callback); // ease of testing. could be refactored to use automatic discovery
+        var res = sut.Build();
+
+        // Assert
+        res.Should().BeOfType<BrerListener>();
+        res.Topics.Should().BeEquivalentTo("MyTestTopic", "MyTestTopic2");
+    }
    
 }
