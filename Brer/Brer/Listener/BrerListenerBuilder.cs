@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Brer.Attributes;
 using Brer.Core.Interfaces;
+using Brer.Exceptions;
 using Brer.Listener.Interfaces;
 using Brer.Listener.Runtime;
 using Brer.Listener.Runtime.Interfaces;
@@ -16,7 +17,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
 {
     private readonly IBrerContext _context;
     private readonly IServiceProvider _serviceProvider;
-    
+
     public readonly Dictionary<string, IDispatcher> Dispatchers;
 
     public BrerListenerBuilder(IBrerContext context, IServiceProvider serviceProvider)
@@ -34,7 +35,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         Dispatchers.Add(topic, dispatcher);
         return this;
     }
-    
+
     [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
     public BrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher)
     {
@@ -53,7 +54,14 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
 
             if (handlerAttr == null) continue;
 
-            var parameterType = method.GetParameters()[0].ParameterType;
+            var parameters = method.GetParameters();
+            if (parameters.Length != 1)
+            {
+                throw new InvalidBrerHandlerParameterCountException(
+                    $"Invalid number of parameters provide in handler: {method.Name}, expected 1 but found {parameters.Length}");
+            }
+
+            var parameterType = parameters[0].ParameterType;
             var dispatcher = new ListenerDispatcher(type, method, parameterType, _serviceProvider);
 
             _context.Logger.LogInformation(
