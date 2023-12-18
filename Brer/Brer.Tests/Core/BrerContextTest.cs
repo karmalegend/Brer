@@ -11,7 +11,7 @@ namespace BrerTests.Core;
 public class BrerContextTest
 {
     [Fact]
-    public void BrerContext_ShouldDeclareAnExchangeOnTheSpecifiedChannel_WhenInitialized()
+    public void BrerContext_Should_Declare_An_Exchange_On_The_Specified_Channel_When_Initialized()
     {
         // Arrange
         var logger = Substitute.For<MockLogger<BrerContext>>();

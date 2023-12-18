@@ -15,7 +15,7 @@ namespace BrerTests.Listener;
 public class BrerListenerTest
 {
     [Fact]
-    public void StartListening_ShouldRegisterTheCorrectTopics_WhenCalled()
+    public void StartListening_Should_Register_The_Correct_Topics_When_Called()
     {
         // Arrange
         var context = Substitute.For<IBrerContext>();

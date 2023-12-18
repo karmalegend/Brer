@@ -17,7 +17,7 @@ namespace BrerTests.Listener;
 public class BrerListenerBuilderTest
 {
     [Fact]
-    public void Subscribe_ShouldRegisterDispatcher_WhenCalledWithAction()
+    public void Subscribe_Should_Register_Dispatcher_When_Called_With_Action()
     {
         // Arrange
         var topic = "MyTopic";
@@ -44,7 +44,7 @@ public class BrerListenerBuilderTest
     }
 
     [Fact]
-    public void Subscribe_ShouldRegisterDispatcher_WhenCalledWithCallBackDispatcher()
+    public void Subscribe_Should_Register_Dispatcher_When_Called_With_CallBackDispatcher()
     {
         // Arrange
         var topic = "MyTopic";
@@ -72,7 +72,7 @@ public class BrerListenerBuilderTest
     }
 
     [Fact]
-    public void Subscribe_ShouldSubscribeTypeWithoutHandlers_WhenTypeHasEventListenerAttributeButNoHandlerAttributes()
+    public void Subscribe_Should_Subscribe_Type_Without_Handlers_When_Type_Has_EventListener_Attribute_But_No_Handler_Attributes()
     {
         // Arrange
         var mockBrerContext = Substitute.For<IBrerContext>();
@@ -92,7 +92,7 @@ public class BrerListenerBuilderTest
     }
 
     [Fact]
-    public void Subscribe_ShouldThrowInvalidBrerHandlerParameterCountException_WhenHandlerHasNoParameters()
+    public void Subscribe_Should_Throw_Invalid_Brer_Handler_Parameter_Count_Exception_When_Handler_Has_No_Parameters()
     {
         // Arrange
         var mockBrerContext = Substitute.For<IBrerContext>();
@@ -115,7 +115,7 @@ public class BrerListenerBuilderTest
 
 
     [Fact]
-    public void Subscribe_ShouldThrowInvalidBrerHandlerParameterCountException_WhenHandlerHasMoreThanOneParameter()
+    public void Subscribe_Should_Throw_Invalid_Brer_Handler_Parameter_Count_Exception_When_Handler_Has_More_Than_One_Parameter()
     {
         // Arrange
         var mockBrerContext = Substitute.For<IBrerContext>();
@@ -137,7 +137,7 @@ public class BrerListenerBuilderTest
     }
 
     [Fact]
-    public void Subscribe_ShouldSubscribeTypeWithHandlers_WhenTypeHasEventListenerAttributeAndHandlerAttributes()
+    public void Subscribe_Should_Subscribe_Type_With_Handlers_When_Type_Has_EventListener_Attribute_And_Handler_Attributes()
     {
         // Arrange
         var mockBrerContext = Substitute.For<IBrerContext>();
@@ -160,7 +160,7 @@ public class BrerListenerBuilderTest
     }
 
     [Fact]
-    public void DiscoverAndSubscribeAll_ShouldRegisterAndSubscribeClasses_WhenTheyHaveTheEventListenerAttribute()
+    public void DiscoverAndSubscribeAll_Should_Register_And_Subscribe_Classes_When_They_Have_The_EventListener_Attribute()
     {
         // Arrange
         var mockBrerContext = Substitute.For<IBrerContext>();
@@ -193,7 +193,7 @@ public class BrerListenerBuilderTest
     }
 
     [Fact]
-    public void Build_ShouldReturnABrerListener_WhenCalled()
+    public void Build_Should_Return_A_BrerListener_When_Called()
     {
         // Arrange
         var mockBrerContext = Substitute.For<IBrerContext>();

@@ -18,7 +18,7 @@ public class BrerOptionsBuilderTest
     }
 
     [Fact]
-    public void Build_ShouldBuildTheBrerOptions_WhenBuildIsCalled()
+    public void Build_Should_Build_The_BrerOptions_When_Build_Is_Called()
     {
         // Arrange
         var expectedOptions =
@@ -35,7 +35,7 @@ public class BrerOptionsBuilderTest
     }
 
     [Fact]
-    public void Build_ShouldBuildThebrerOptionsWithDefaultValues_WhenConstantsAreUsed()
+    public void Build_Should_Build_The_BrerOptions_With_Default_Values_When_Constants_Are_Used()
     {
         // Arrange
         var expectedOptions =
@@ -53,7 +53,7 @@ public class BrerOptionsBuilderTest
     }
 
     [Fact]
-    public void ReadFromEnvironmentVariables_ShouldReadVarsFromEnvVars_WhenCalled()
+    public void ReadFromEnvironmentVariables_Should_Read_Vars_From_Env_Vars_When_Called()
     {
         // Arrange
         var expectedOptions =
@@ -84,7 +84,7 @@ public class BrerOptionsBuilderTest
     [InlineData("Host", "42", "exchange", null, "user", "password", "QueueName")]
     [InlineData("Host", "42", "exchange", "queue", null, "password", "RabbitMqUser")]
     [InlineData("Host", "42", "exchange", "queue", "user", null, "RabbitMqPass")]
-    public void ReadFromEnvironmentVariables_ShouldThrowArgumentNullException_WhenValueIsMissing(string host,
+    public void ReadFromEnvironmentVariables_Should_Throw_ArgumentNullException_When_Value_Is_Missing(string host,
         string port, string exchange, string queue, string user, string password, string fieldNullName)
     {
         // Arrange
