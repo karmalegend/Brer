@@ -17,7 +17,7 @@ internal class CallBackDispatcher<T> : IDispatcher
 
     public void Dispatch(BasicDeliverEventArgs e)
     {
-        var bodyString = Encoding.Unicode.GetString(e.Body.ToArray());
+        var bodyString = Encoding.Unicode.GetString(e.Body.Span);
         T inflated = JsonConvert.DeserializeObject<T>(bodyString) ?? throw new InvalidOperationException();
         _callback.Invoke(inflated);
 
