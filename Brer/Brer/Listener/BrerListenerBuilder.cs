@@ -28,7 +28,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
     }
 
     [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
-    public BrerListenerBuilder Subscribe<T>(string topic, Action<T> callback)
+    public IBrerListenerBuilder Subscribe<T>(string topic, Action<T> callback)
     {
         _context.Logger.LogInformation("Subscribing {Topic} to {Callback}", topic, callback);
         var dispatcher = new CallBackDispatcher<T>(callback);
@@ -37,14 +37,14 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
     }
 
     [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
-    public BrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher)
+    public IBrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher)
     {
         _context.Logger.LogInformation("Subscribing {Topic} to {Dispatcher}", topic, dispatcher);
         Dispatchers.Add(topic, dispatcher);
         return this;
     }
 
-    public BrerListenerBuilder Subscribe(Type type)
+    public IBrerListenerBuilder Subscribe(Type type)
     {
         if (type.GetCustomAttributes().All(t => t.GetType() != typeof(EventListenerAttribute))) return this;
         _context.Logger.LogInformation("Subscribing {Type}", type.Name);
@@ -74,7 +74,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         return this;
     }
 
-    public BrerListenerBuilder DiscoverAndSubscribeAll()
+    public IBrerListenerBuilder DiscoverAndSubscribeAll()
     {
         var referencedAssemblies = GetReferencingAssemblies();
         foreach (var assembly in referencedAssemblies)
@@ -87,7 +87,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
     }
 
 
-    public BrerListener Build()
+    public IBrerListener Build()
     {
         var listener = new BrerListener(_context, Dispatchers);
         return listener;
