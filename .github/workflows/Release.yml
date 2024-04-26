@@ -17,19 +17,23 @@ jobs:
         with:
           dotnet-version: 8.0.x
           
-        working-directory: ./Brer
 
       - name: Restore dependencies
         run: dotnet restore
+        working-directory: ./Brer  # moving working-directory here
 
       - name: Build
         run: dotnet build --no-restore
+        working-directory: ./Brer
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
+        working-directory: ./Brer
 
       - name: Pack
         run: dotnet pack --no-build -c Release -o out
+        working-directory: ./Brer
 
       - name: Push NuGet Package
         run: dotnet nuget push out/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        working-directory: ./Brer 
