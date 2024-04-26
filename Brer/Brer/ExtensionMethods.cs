@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Brer;
-
+//testing
 public static class ExtensionMethods
 {
     public static IServiceCollection UseBrer(this IServiceCollection services,
