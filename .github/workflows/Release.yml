@@ -2,6 +2,8 @@
 
 on:
   push:
+    paths:
+      - Brer/**
     branches:
       - main 
 
