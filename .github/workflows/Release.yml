@@ -27,7 +27,7 @@ jobs:
         working-directory: ./Brer
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --verbosity normal
         working-directory: ./Brer
 
       - name: Pack
