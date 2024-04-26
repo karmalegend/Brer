@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <PackageVersion>0.1.1</PackageVersion>
+        <PackageVersion>1.0.0</PackageVersion>
         <Nullable>enable</Nullable>
         <Title>Brer</Title>
         <Authors>Karmalegend</Authors>
@@ -12,7 +12,7 @@
         <license>https://github.com/karmalegend/Brer/blob/main/LICENSE</license>
         <RepositoryUrl>https://github.com/karmalegend/Brer</RepositoryUrl>
         <RepositoryType>Github</RepositoryType>
-        <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+        <PackageReleaseNotes>.NET 8 release candidate</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
