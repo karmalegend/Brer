@@ -23,7 +23,7 @@ jobs:
         working-directory: ./Brer  # moving working-directory here
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build --configuration Release --no-restore
         working-directory: ./Brer
 
       - name: Test
