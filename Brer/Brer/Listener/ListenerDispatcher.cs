@@ -30,8 +30,10 @@ internal class ListenerDispatcher : IDispatcher
             Encoding.Unicode.GetString(e.Body.ToArray()),
             _parameterType);
 
+        using var scope = _serviceProvider.CreateScope();
+        
         var instance = ActivatorUtilities.GetServiceOrCreateInstance(
-            _serviceProvider.CreateScope().ServiceProvider, _eventListenerType);
+            scope.ServiceProvider, _eventListenerType);
 
         // since we don't have logging yet an exception should be thrown.
         _method.Invoke(instance, new[] {param});
