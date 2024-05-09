@@ -36,8 +36,9 @@ public class BrerListenerTest
             {"eventKey", dispatcher}
         };
 
+        var wildcardDispatchers = new Dictionary<string, IDispatcher>();
 
-        var sut = new BrerListener(context, dispatchers);
+        var sut = new BrerListener(context, dispatchers,wildcardDispatchers);
 
         // Act
         var res = sut.StartListening();

@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using Brer.Attributes;
 using Brer.Core.Interfaces;
 using Brer.Exceptions;
 using Brer.Listener;
+using Brer.Listener.Runtime.Interfaces;
 using BrerTests.Helpers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -22,19 +24,21 @@ public class BrerListenerBuilderTest
         var mockBrerContext = Substitute.For<IBrerContext>();
         var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
         var listenerWithoutHandlers = new BrerEventListenerWithoutHandlersMock().GetType();
-
+    
         mockBrerContext.Logger.Returns(mockLogger);
-
+    
         var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
+    
         // Act
         sut.Subscribe(listenerWithoutHandlers);
-
+    
         // Assert
         mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithoutHandlersMock");
-        sut.Dispatchers.Keys.Count.Should().Be(0);
+        
+        var dispatchers = GetDispatchers(sut);
+        dispatchers.Keys.Count.Should().Be(0);
     }
-
+    
     [Fact]
     public void Subscribe_Should_Throw_Invalid_Brer_Handler_Parameter_Count_Exception_When_Handler_Has_No_Parameters()
     {
@@ -42,22 +46,22 @@ public class BrerListenerBuilderTest
         var mockBrerContext = Substitute.For<IBrerContext>();
         var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
         mockBrerContext.Logger.Returns(mockLogger);
-
+    
         var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
+    
         var runtimeType = BuildDynamicTypeWithMethodsAndAttributes(0);
-
+    
         // Act
         var exception = Record.Exception(() => sut.Subscribe(runtimeType))!;
-
+    
         // Assert
         mockLogger.Received(1).Log(LogLevel.Information, "Subscribing DynamicTestType");
         exception.Should().BeOfType<InvalidBrerHandlerParameterCountException>();
         exception.Message.Should()
             .Be("Invalid number of parameters provide in handler: MethodWithNParameters, expected 1 but found 0");
     }
-
-
+    
+    
     [Fact]
     public void Subscribe_Should_Throw_Invalid_Brer_Handler_Parameter_Count_Exception_When_Handler_Has_More_Than_One_Parameter()
     {
@@ -65,21 +69,21 @@ public class BrerListenerBuilderTest
         var mockBrerContext = Substitute.For<IBrerContext>();
         var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
         mockBrerContext.Logger.Returns(mockLogger);
-
+    
         var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
+    
         var runtimeType = BuildDynamicTypeWithMethodsAndAttributes(2);
-
+    
         // Act
         var exception = Record.Exception(() => sut.Subscribe(runtimeType))!;
-
+    
         // Assert
         mockLogger.Received(1).Log(LogLevel.Information, "Subscribing DynamicTestType");
         exception.Should().BeOfType<InvalidBrerHandlerParameterCountException>();
         exception.Message.Should()
             .Be("Invalid number of parameters provide in handler: MethodWithNParameters, expected 1 but found 2");
     }
-
+    
     [Fact]
     public void Subscribe_Should_Subscribe_Type_With_Handlers_When_Type_Has_EventListener_Attribute_And_Handler_Attributes()
     {
@@ -88,19 +92,22 @@ public class BrerListenerBuilderTest
         var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
         var listenerWithHandlers = new BrerEventListenerWithHandlersMock().GetType();
         mockBrerContext.Logger.Returns(mockLogger);
-
-
+    
+    
         var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
+    
         // Act
         sut.Subscribe(listenerWithHandlers);
-
+    
         // Assert
         mockLogger.Received(1).Log(LogLevel.Information, "Subscribing BrerEventListenerWithHandlersMock");
         mockLogger.Received(1).Log(LogLevel.Information,
             "Subscribing BrerEventListenerWithHandlersMock EventHandler with param of type Object to MyUnitTestTopic");
-        sut.Dispatchers.Keys.Count.Should().Be(1);
-        sut.Dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
+        
+        var dispatchers = GetDispatchers(sut);
+
+        dispatchers.Keys.Count.Should().Be(1);
+        dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
     }
 
     [Fact]
@@ -131,9 +138,11 @@ public class BrerListenerBuilderTest
         mockLogger.Received(1).Log(LogLevel.Information,
             "Subscribing ExtraBrerEventListenerWithHandlersMock ExtraEventHandler with param of type Object to MyExtraUnitTestTopic");
 
-        sut.Dispatchers.Keys.Count.Should().Be(2);
-        sut.Dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
-        sut.Dispatchers["MyExtraUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
+        var dispatchers = GetDispatchers(sut);
+        
+        dispatchers.Keys.Count.Should().Be(2);
+        dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
+        dispatchers["MyExtraUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
     }
 
 
@@ -177,5 +186,12 @@ public class BrerListenerBuilderTest
         methodIlGen.Emit(OpCodes.Ret); // Add return to the method body
 
         return typeBuilder.CreateType()!;
+    }
+
+    private static Dictionary<string, IDispatcher> GetDispatchers(BrerListenerBuilder listenerBuilder)
+    {
+        var prop = listenerBuilder.GetType().GetField("_dispatchers", BindingFlags.NonPublic | BindingFlags.Instance);
+        var dispatchers = prop!.GetValue(listenerBuilder);
+        return (dispatchers as Dictionary<string, IDispatcher>)!;
     }
 }
