@@ -5,7 +5,6 @@ using Brer.Attributes;
 using Brer.Core.Interfaces;
 using Brer.Exceptions;
 using Brer.Listener;
-using Brer.Listener.Runtime;
 using BrerTests.Helpers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -16,61 +15,6 @@ namespace BrerTests.Listener;
 
 public class BrerListenerBuilderTest
 {
-    [Fact]
-    public void Subscribe_Should_Register_Dispatcher_When_Called_With_Action()
-    {
-        // Arrange
-        var topic = "MyTopic";
-
-        var mockBrerContext = Substitute.For<IBrerContext>();
-        var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
-
-        mockBrerContext.Logger.Returns(mockLogger);
-
-        // we just need a random Action
-        Action<BrerListenerBuilder> callback = _ => { };
-
-
-        var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
-        // Act
-        sut.Subscribe(topic, callback);
-
-        // Assert
-        mockLogger.Received(1).Log(LogLevel.Information,
-            "Subscribing MyTopic to System.Action`1[Brer.Listener.BrerListenerBuilder]");
-        sut.Dispatchers.Keys.Should().Contain("MyTopic");
-        sut.Dispatchers["MyTopic"].Should().BeOfType<CallBackDispatcher<BrerListenerBuilder>>();
-    }
-
-    [Fact]
-    public void Subscribe_Should_Register_Dispatcher_When_Called_With_CallBackDispatcher()
-    {
-        // Arrange
-        var topic = "MyTopic";
-
-        var mockBrerContext = Substitute.For<IBrerContext>();
-        var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
-
-        mockBrerContext.Logger.Returns(mockLogger);
-
-        // we just need a random Action
-        Action<BrerListenerBuilder> action = _ => { };
-        var callback = new CallBackDispatcher<BrerListenerBuilder>(action);
-
-
-        var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
-        // Act
-        sut.Subscribe(topic, callback);
-
-        // Assert
-        mockLogger.Received(1).Log(LogLevel.Information,
-            "Subscribing MyTopic to Brer.Listener.Runtime.CallBackDispatcher`1[Brer.Listener.BrerListenerBuilder]");
-        sut.Dispatchers.Keys.Should().Contain("MyTopic");
-        sut.Dispatchers["MyTopic"].Should().BeOfType<CallBackDispatcher<BrerListenerBuilder>>();
-    }
-
     [Fact]
     public void Subscribe_Should_Subscribe_Type_Without_Handlers_When_Type_Has_EventListener_Attribute_But_No_Handler_Attributes()
     {
@@ -190,30 +134,6 @@ public class BrerListenerBuilderTest
         sut.Dispatchers.Keys.Count.Should().Be(2);
         sut.Dispatchers["MyUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
         sut.Dispatchers["MyExtraUnitTestTopic"].Should().BeOfType<ListenerDispatcher>();
-    }
-
-    [Fact]
-    public void Build_Should_Return_A_BrerListener_When_Called()
-    {
-        // Arrange
-        var mockBrerContext = Substitute.For<IBrerContext>();
-        var mockLogger = Substitute.For<MockLogger<IBrerContext>>();
-        mockBrerContext.Logger.Returns(mockLogger);
-
-
-        var sut = new BrerListenerBuilder(mockBrerContext, Substitute.For<IServiceProvider>());
-
-        // we just need a random Action
-        Action<BrerListenerBuilder> callback = _ => { };
-
-        // Act
-        sut.Subscribe("MyTestTopic", callback); // ease of testing. could be refactored to use automatic discovery
-        sut.Subscribe("MyTestTopic2", callback); // ease of testing. could be refactored to use automatic discovery
-        var res = sut.Build();
-
-        // Assert
-        res.Should().BeOfType<BrerListener>();
-        res.Topics.Should().BeEquivalentTo("MyTestTopic", "MyTestTopic2");
     }
 
 

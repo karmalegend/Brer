@@ -6,7 +6,6 @@ using Brer.Attributes;
 using Brer.Core.Interfaces;
 using Brer.Exceptions;
 using Brer.Listener.Interfaces;
-using Brer.Listener.Runtime;
 using Brer.Listener.Runtime.Interfaces;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
@@ -26,24 +25,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         Dispatchers = new Dictionary<string, IDispatcher>();
         _serviceProvider = serviceProvider;
     }
-
-    [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
-    public IBrerListenerBuilder Subscribe<T>(string topic, Action<T> callback)
-    {
-        _context.Logger.LogInformation("Subscribing {Topic} to {Callback}", topic, callback);
-        var dispatcher = new CallBackDispatcher<T>(callback);
-        Dispatchers.Add(topic, dispatcher);
-        return this;
-    }
-
-    [Obsolete("Method is no longer accessible without hacking your way to it, please stick to automatic discovery & registration")]
-    public IBrerListenerBuilder Subscribe<T>(string topic, CallBackDispatcher<T> dispatcher)
-    {
-        _context.Logger.LogInformation("Subscribing {Topic} to {Dispatcher}", topic, dispatcher);
-        Dispatchers.Add(topic, dispatcher);
-        return this;
-    }
-
+    
     public IBrerListenerBuilder Subscribe(Type type)
     {
         if (type.GetCustomAttributes().All(t => t.GetType() != typeof(EventListenerAttribute))) return this;
