@@ -17,12 +17,14 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
     private readonly IBrerContext _context;
     private readonly IServiceProvider _serviceProvider;
 
-    public readonly Dictionary<string, IDispatcher> Dispatchers;
+    private readonly Dictionary<string, IDispatcher> _dispatchers;
+    private readonly Dictionary<string, IDispatcher> _wildCardDispatchers;
 
     public BrerListenerBuilder(IBrerContext context, IServiceProvider serviceProvider)
     {
         _context = context;
-        Dispatchers = new Dictionary<string, IDispatcher>();
+        _dispatchers = new Dictionary<string, IDispatcher>();
+        _wildCardDispatchers = new Dictionary<string, IDispatcher>();
         _serviceProvider = serviceProvider;
     }
     
@@ -33,8 +35,9 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
         foreach (var method in type.GetMethods())
         {
             var handlerAttr = method.GetCustomAttribute<HandlerAttribute>();
+            var wildCardHandlerAttr = method.GetCustomAttribute<WildCardHandlerAttribute>();
 
-            if (handlerAttr == null) continue;
+            if (handlerAttr == null && wildCardHandlerAttr == null) continue;
 
             var parameters = method.GetParameters();
             if (parameters.Length != 1)
@@ -48,9 +51,15 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
 
             _context.Logger.LogInformation(
                 "Subscribing {Type} {Method} with param of type {Parameter} to {HandlerAttr}",
-                type.Name, method.Name, parameterType?.Name, handlerAttr.Topic);
+                type.Name, method.Name, parameterType.Name, handlerAttr == null ? wildCardHandlerAttr!.TopicWildCard : handlerAttr.Topic);
 
-            Dispatchers.Add(handlerAttr.Topic, dispatcher);
+            if(handlerAttr == null)
+            {
+                _wildCardDispatchers.Add(wildCardHandlerAttr!.TopicWildCard,dispatcher);
+                continue;
+            }
+            
+            _dispatchers.Add(handlerAttr.Topic,dispatcher);
         }
 
         return this;
@@ -71,7 +80,7 @@ internal class BrerListenerBuilder : IBrerListenerBuilder
 
     public IBrerListener Build()
     {
-        var listener = new BrerListener(_context, Dispatchers);
+        var listener = new BrerListener(_context, _dispatchers,_wildCardDispatchers);
         return listener;
     }
 

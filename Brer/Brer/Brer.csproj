@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <PackageVersion>1.0.11</PackageVersion>
+        <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+        <PackageVersion>1.0.12</PackageVersion>
         <Nullable>enable</Nullable>
         <Title>Brer</Title>
         <Authors>Karmalegend</Authors>

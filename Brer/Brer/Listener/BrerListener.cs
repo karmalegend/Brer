@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Brer.Core.Interfaces;
+using Brer.Helpers;
 using Brer.Listener.Interfaces;
 using Brer.Listener.Runtime.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -14,29 +17,34 @@ internal sealed class BrerListener : IBrerListener
 {
     private readonly IBrerContext _context;
     private readonly Dictionary<string, IDispatcher> _dispatchers;
+    private readonly Dictionary<string, IDispatcher> _wildCardDispatchers;
+    private readonly string[] _topics;
     private IModel? _channel;
 
-    public BrerListener(IBrerContext context, Dictionary<string, IDispatcher> dispatchers)
+    public BrerListener(IBrerContext context, Dictionary<string, IDispatcher> dispatchers, Dictionary<string,IDispatcher> wildCardDispatchers)
     {
         _context = context;
         _dispatchers = dispatchers;
+        _wildCardDispatchers = wildCardDispatchers;
+        
+        _topics = _dispatchers.Keys.Concat(_wildCardDispatchers.Keys).ToArray();
     }
 
-    public IEnumerable<string> Topics => _dispatchers.Keys;
-
+    
     public IBrerListener StartListening()
     {
         _channel = _context.Connection.CreateModel();
         _channel.ExchangeDeclare(exchange: _context.BrerOptions.ExchangeName, type: ExchangeType.Topic);
         _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false);
-        foreach (var topic in Topics)
+        foreach (var topic in _topics)
         {
-            _context.Logger.LogInformation("Start Listening on queue {q}, exchange {exh}, topic {top}",
+            _context.Logger.LogInformation("Start Listening on queue {BrerQueue}, exchange {BrerExchange}, topic {BerTopic}",
                 _context.BrerOptions.QueueName, _context.BrerOptions.ExchangeName, topic);
             _channel.QueueBind(queue: _context.BrerOptions.QueueName, exchange: _context.BrerOptions.ExchangeName,
                 routingKey: topic);
         }
 
+        TransformWildCardKeys();
         return this;
     }
 
@@ -50,17 +58,26 @@ internal sealed class BrerListener : IBrerListener
 
     private void EventReceived(object? sender, BasicDeliverEventArgs e)
     {
-        _context.Logger.LogInformation("Received event on exchange {ex} with routingkey {key}. Consumertag : {ct}",
+        _context.Logger.LogInformation("Received event on exchange {BrerExchange} with routingkey {BrerRoutingKey}. Consumertag : {BerConsumerTag}",
             e.Exchange, e.RoutingKey, e.ConsumerTag);
         try
         {
             var topic = e.RoutingKey;
-            var dispatcherTask = Task.Run(() => _dispatchers[topic].Dispatch(e));
-            dispatcherTask.Wait();
+            if (_dispatchers.TryGetValue(topic, out var dispatcher))
+            {
+                var dispatcherTask = Task.Run(() => dispatcher.Dispatch(e));
+                dispatcherTask.Wait();
+            }
+            else
+            {
+                var wildCardDispatcherTopic = _wildCardDispatchers.Keys.First(x => Regex.IsMatch(topic, x));
+                _wildCardDispatchers[wildCardDispatcherTopic].Dispatch(e);
+            }
+            
 
             //only acknowledge when dispatch has successfully finished.
             _channel?.BasicAck(e.DeliveryTag, false);
-            _context.Logger.LogInformation("Handled event on exchange {ex} with routingkey {key}. Consumertag : {ct}",
+            _context.Logger.LogInformation("Handled event on exchange {BrerExchange} with routingkey {BrerRoutingKey }. Consumertag : {BrerConsumerTag }",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
         }
         catch (Exception exception)
@@ -72,8 +89,20 @@ internal sealed class BrerListener : IBrerListener
             // rendering it unable to re-pop items from the queue.
             _channel?.BasicNack(e.DeliveryTag, false, true);
             _context.Logger.LogError(exception,
-                "Failed to handle event on exchange {ex} with routingkey {key}. Consumertag : {ct}",
+                "Failed to handle event on exchange {BrerExchange} with routingkey {BrerRoutingKey}. Consumertag : {BrerConsumerTag}",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
+        }
+    }
+    
+    
+    private void TransformWildCardKeys()
+    {
+        _context.Logger.LogInformation("Transforming wildcard keys into pattern");
+        var keys = _wildCardDispatchers.Keys.ToArray();
+        foreach (var key in keys)
+        {
+            var pattern = key.Replace(".","\\.").Replace("*", @"\w+").Replace("#","[\\w\\.]+");
+            _wildCardDispatchers.RenameKey(key,pattern);
         }
     }
 
