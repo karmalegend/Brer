@@ -28,7 +28,7 @@ public class BrerOptionsBuilderTest
 
         // Act
         var res = _sut.WithAddress(host: "host", port: 123).WithExchange("Exchange")
-            .WithQueueName("Queue").WithUserName("user").WithPassword("password").Build();
+            .WithQueueName("Queue").WithUsername("user").WithPassword("password").Build();
 
         // Assert
         res.Should().BeEquivalentTo(expectedOptions);
@@ -45,7 +45,7 @@ public class BrerOptionsBuilderTest
 
         // Act
         var res = _sut.WithAddress(host: BrerOptionsBuilder.LocalHost, BrerOptionsBuilder.DefaultPort)
-            .WithPassword(BrerOptionsBuilder.DefaultLogin).WithUserName(BrerOptionsBuilder.DefaultLogin)
+            .WithPassword(BrerOptionsBuilder.DefaultLogin).WithUsername(BrerOptionsBuilder.DefaultLogin)
             .WithExchange("Exchange").WithQueueName("Queue").Build();
 
         // Assert

@@ -8,6 +8,8 @@ __Special thanks to Marco Pil__
 - [How do i use Brer?](#how-do-i-use-brer)
   - [Initial Setup](#initial-setup)
   - [Registering/Decorating an EventListener](#registeringdecorating-an-eventlistener)
+      - [Handler](#handler)
+      - [WildCardHandler](#wildcardhandler)
   - [Publishing events.](#publishing-events)
 - [I want to contribute!](#i-want-to-contribute)
 - [I'm missing a feature!](#im-missing-a-feature)
@@ -26,7 +28,7 @@ In short one must register the Brer services as follows:
 services.UseBrer(
     new BrerOptionsBuilder().WithAddress(BrerOptionsBuilder.localHost, BrerOptionsBuilder.defaultPort)
         .WithPassword(BrerOptionsBuilder.defaultLogin)
-        .WithUserName(BrerOptionsBuilder.defaultLogin)
+        .WithUsername(BrerOptionsBuilder.defaultLogin)
         .WithExchange("MyExchange")
         .WithQueueName("MyQueue")
         .Build()
@@ -49,15 +51,42 @@ Where it will look for the following variables:
 ## Registering/Decorating an EventListener
 Brer will automatically scan all referencing assemblies for EventListeners.
 
-Once a class is annoted with the ```EventListener``` attribute it will further scan the class for ```Handlers```.
+Once a class is annoted with the ```EventListener``` attribute it will further scan the class for ```Handler``` or ```WildCardHandler```.
 
-**NOTE:** wildcards are currently not (officially) supported.
+If Listeners collide on topic names ```Handler``` will always take priority over ```WildCardHandler```.
 
+#### Handler
 ```C#
 [EventListener]
 public class MyEventHandler{
 
     [Handler(topic:"MyTopic")]
+    public async Task Handle(MyEvent @event){
+        // do stuff
+    }
+
+}
+```
+
+
+#### WildCardHandler
+
+When using a WildCardHandler you're **required** to use at least 1 wild card in the topic binding.
+
+Wild cards can contain as many * as wanted but impose some restrictions on the usage of #.
+Only 1 # can be used somewhere in the middle of a topic name and 1 the end. if you require more it's likely best to re-evaluate the topic naming or simply use *.
+
+A valid format would be:
+```MyGarage*.Rental.Cars.#.Internal.*.#```
+
+An invalid format would be:
+```MyGarage.#.Cars.#.Internal.*.#``` We use two #'s in the middle of the topic here which is not allowed.
+
+```C#
+[EventListener]
+public class MyEventHandler{
+
+    [Handler("MyTopic.#")]
     public async Task Handle(MyEvent @event){
         // do stuff
     }
