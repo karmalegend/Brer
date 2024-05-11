@@ -37,7 +37,7 @@ public class BrerOptionsBuilder
         return this;
     }
 
-    public BrerOptionsBuilder WithUserName(string username)
+    public BrerOptionsBuilder WithUsername(string username)
     {
         RabbitMqUser = username;
         return this;
