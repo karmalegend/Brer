@@ -31,12 +31,16 @@ public class BrerListenerTest
 
         var dispatcher = Substitute.For<IDispatcher>();
 
-        var dispatchers = new Dictionary<string, IDispatcher>()
+        var dispatchers = new Dictionary<string, IDispatcher>
         {
             {"eventKey", dispatcher}
         };
 
-        var wildcardDispatchers = new Dictionary<string, IDispatcher>();
+        var wildcardDispatchers = new Dictionary<string, IDispatcher>
+        {
+            {"eventKey.#", dispatcher},
+            {"eventKey.*", dispatcher}
+        };
 
         var sut = new BrerListener(context, dispatchers,wildcardDispatchers);
 
@@ -49,8 +53,13 @@ public class BrerListenerTest
         channel.Received(1).QueueDeclare("MyQueue", true, false, false);
         logger.Received(1).Log(LogLevel.Information,"Start Listening on queue MyQueue, exchange MyExchange, topic eventKey");
         channel.Received(1).QueueBind("MyQueue", "MyExchange", "eventKey");
+        channel.Received(1).QueueBind("MyQueue", "MyExchange", "eventKey.#");
+
+        wildcardDispatchers.Keys.Should().Contain(@"eventKey\.[\w\.]+");
+        wildcardDispatchers.Keys.Should().Contain(@"eventKey\.\w+");
         res.Should().BeOfType<BrerListener>();
     }
     
     // TODO: potentially look into spinning up an integration test for Receiving events.
+    
 }

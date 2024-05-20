@@ -77,10 +77,13 @@ Wild cards can contain as many * as wanted but impose some restrictions on the u
 Only 1 # can be used somewhere in the middle of a topic name and 1 the end. if you require more it's likely best to re-evaluate the topic naming or simply use *.
 
 A valid format would be:
-```MyGarage*.Rental.Cars.#.Internal.*.#```
+* ```MyGarage*.Rental.Cars.#.Internal.*.#```
+* ```#```
+* etc
 
 An invalid format would be:
 ```MyGarage.#.Cars.#.Internal.*.#``` We use two #'s in the middle of the topic here which is not allowed.
+
 
 ```C#
 [EventListener]
