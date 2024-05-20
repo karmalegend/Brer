@@ -7,7 +7,7 @@ namespace Brer.Attributes;
 public class WildCardHandlerAttribute : Attribute
 {
     public string TopicWildCard { get; set; }
-    internal static readonly string RegexHandler = @"^(?=.*[*#])([a-z A-Z 0-9*]+\.)*(#\.)?[a-z A-Z 0-9*+\.]+(\.#)?$";
+    internal static readonly string RegexHandler = @"^(#$)|^(?=.*[*#])([a-z A-Z 0-9*]+\.)*(#\.)?[a-z A-Z 0-9*+\.]+(\.#)?$";
 
     public WildCardHandlerAttribute(string topicWildCard)
     {
