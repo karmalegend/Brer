@@ -11,7 +11,7 @@ namespace Brer.Publisher;
 internal class BrerPublisher : IBrerPublisher
 {
     private readonly IBrerContext _context;
-//
+
     public BrerPublisher(IBrerContext context)
     {
         _context = context;
