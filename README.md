@@ -4,6 +4,8 @@ A rabbitMQ library for ASP.NET.
 
 __Special thanks to Marco Pil__
 
+[![Auto Publish to NuGet](https://github.com/karmalegend/Brer/actions/workflows/Release.yml/badge.svg)](https://github.com/karmalegend/Brer/actions/workflows/Release.yml)
+
 - [Brer](#brer)
 - [How do i use Brer?](#how-do-i-use-brer)
   - [Initial Setup](#initial-setup)
