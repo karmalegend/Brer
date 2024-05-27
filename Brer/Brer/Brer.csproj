@@ -8,13 +8,14 @@
         <Authors>Karmalegend</Authors>
         <Description>Brer is a simple wrapper for RABBITMQ using ASP.NET based clients. </Description>
         <PackageProjectUrl>https://github.com/karmalegend/Brer</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/karmalegend/Brer/blob/main/LICENSE</PackageLicenseUrl>
-        <license>https://github.com/karmalegend/Brer/blob/main/LICENSE</license>
         <RepositoryUrl>https://github.com/karmalegend/Brer</RepositoryUrl>
-        <RepositoryType>Github</RepositoryType>
-        <PackageReleaseNotes>Properly display readme.</PackageReleaseNotes>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>ASP.NET;RabbitMQ;Wrapper;EventSourcing;EventDriven;Brer;MassTransit;RabbitMQClient</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <ReleaseNotes>
+            - v1.0.12 update target frameworks and introduce wildcard support for topic handlers.
+        </ReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,7 +27,8 @@
     </ItemGroup>
     
     <ItemGroup>
-        <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+        <None Include="../../README.md" Pack="true" PackagePath=""/>
+        <None Include="../../icon.png" Pack="true" PackagePath=""/>
     </ItemGroup>
 
     <ItemGroup>
