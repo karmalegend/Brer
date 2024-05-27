@@ -89,7 +89,7 @@ An invalid format would be:
 [EventListener]
 public class MyEventHandler{
 
-    [Handler("MyTopic.#")]
+    [WildCardHandler("MyTopic.#")]
     public async Task Handle(MyEvent @event){
         // do stuff
     }
