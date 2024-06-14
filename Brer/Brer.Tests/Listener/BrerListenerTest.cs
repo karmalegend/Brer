@@ -26,7 +26,7 @@ public class BrerListenerTest
 
         context.Logger.Returns(logger);
         context.Connection.Returns(connection);
-        context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), "MyExchange", "MyQueue"));
+        context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), "MyExchange", "MyQueue",BrerExchangeType.Topic));
         connection.CreateModel().Returns(channel);
 
         var dispatcher = Substitute.For<IDispatcher>();

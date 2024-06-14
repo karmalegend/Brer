@@ -25,7 +25,7 @@ namespace BrerTests.Publisher
         public BrerPublisherTest()
         {
             _context.Connection.CreateModel().Returns(_model);
-            _context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), _exchangeName, "q"));
+            _context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), _exchangeName, "q",BrerExchangeType.Topic));
             _logger = Substitute.For<MockLogger<IBrerContext>>();
             _context.Logger.Returns(_logger);
             _sut = new BrerPublisher(_context);

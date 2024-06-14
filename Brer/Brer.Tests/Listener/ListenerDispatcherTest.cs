@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using Brer.Listener;
+using Brer.Listener.Runtime;
 using BrerTests.Helpers;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;

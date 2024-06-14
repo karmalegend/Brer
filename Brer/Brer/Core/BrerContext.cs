@@ -27,9 +27,9 @@ internal class BrerContext : IBrerContext
             {
                 _connection = options.Factory.CreateConnection();
                 using var channel = _connection.CreateModel();
-                channel.ExchangeDeclare(options.ExchangeName, ExchangeType.Topic);
-                Logger.LogInformation("Creating connection with Queue : {QueueName} on Exchange : {ExchangeName}",
-                    BrerOptions.QueueName, BrerOptions.ExchangeName);
+                channel.ExchangeDeclare(options.ExchangeName, BrerOptions.ExchangeType.ToString().ToLower());
+                Logger.LogInformation("Creating connection with Queue : {QueueName} on Exchange : {ExchangeName} Of type {ExchangeType}",
+                    BrerOptions.QueueName, BrerOptions.ExchangeName,BrerOptions.ExchangeType.ToString().ToLower());
             }
         }
     }

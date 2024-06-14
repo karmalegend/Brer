@@ -24,7 +24,7 @@ public class BrerContextTest
 
         connectionSub.CreateModel().Returns(modelSub);
 
-        var options = new BrerOptions(connectionFactorySub, "Exchange", "Queue");
+        var options = new BrerOptions(connectionFactorySub, "Exchange", "Queue",BrerExchangeType.Topic);
 
         // Act
         var res = new BrerContext(options, logger);

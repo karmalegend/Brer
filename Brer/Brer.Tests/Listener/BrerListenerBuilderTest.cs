@@ -6,6 +6,7 @@ using Brer.Attributes;
 using Brer.Core.Interfaces;
 using Brer.Exceptions;
 using Brer.Listener;
+using Brer.Listener.Runtime;
 using Brer.Listener.Runtime.Interfaces;
 using BrerTests.Helpers;
 using FluentAssertions;

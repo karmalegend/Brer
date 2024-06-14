@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
 
-namespace Brer.Listener;
+namespace Brer.Listener.Runtime;
 
 internal class ListenerDispatcher : IDispatcher
 {

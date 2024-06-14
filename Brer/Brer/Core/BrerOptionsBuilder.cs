@@ -12,6 +12,7 @@ public class BrerOptionsBuilder
     private int Port { get; set; }
 
     private string ExchangeName { get; set; } = null!;
+    private BrerExchangeType BrerExchangeType { get; set; }
     private string QueueName { get; set; } = null!;
 
     private string RabbitMqUser { get; set; } = null!;
@@ -28,6 +29,12 @@ public class BrerOptionsBuilder
     public BrerOptionsBuilder WithExchange(string exchange)
     {
         ExchangeName = exchange;
+        return this;
+    }
+
+    public BrerOptionsBuilder WithExchangeType(BrerExchangeType brerExchangeType)
+    {
+        BrerExchangeType = brerExchangeType;
         return this;
     }
 
@@ -75,6 +82,7 @@ public class BrerOptionsBuilder
                 Password = RabbitMqPass
             },
             ExchangeName,
-            QueueName);
+            QueueName,
+            BrerExchangeType);
     }
 }
