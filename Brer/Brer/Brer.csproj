@@ -14,7 +14,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>icon.png</PackageIcon>
         <ReleaseNotes>
-            - v1.0.13 add informational headers to nack'ed messages.
+            - v1.0.13 add informational headers to nack'ed messages &amp; improve async handling.
             - v1.0.12 update target frameworks and introduce wildcard support for topic handlers.
         </ReleaseNotes>
     </PropertyGroup>
