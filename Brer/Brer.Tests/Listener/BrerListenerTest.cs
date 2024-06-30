@@ -36,8 +36,8 @@ public class BrerListenerTest
         _context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), "MyExchange", "MyQueue"));
         _connection.CreateModel().Returns(_channel);
     }
-    
-    
+
+
     [Fact]
     public void StartListening_Should_Register_The_Correct_Topics_When_Called()
     {
@@ -75,17 +75,29 @@ public class BrerListenerTest
     }
 
     [Theory]
-    [InlineData("test.topic")]
-    [InlineData("test.#")]
-    public async Task EventReceived_Should_Requeue_With_Traces_And_Requeue_Count_When_Handler_Throws(string routingKey)
+    [InlineData("test.topic", "test.topic", false)]
+    [InlineData("test.#", "test.topic", true)]
+    public async Task EventReceived_Should_Requeue_With_Traces_And_Requeue_Count_When_Handler_Throws(string routingKey,
+        string publishingKey, bool wildcard)
     {
         // Arrange
         var dispatcher = Substitute.For<IDispatcher>();
-        var dispatchers = new Dictionary<string, IDispatcher> {{"test.topic", dispatcher}};
+        var dispatchers = new Dictionary<string, IDispatcher>();
+        var wildcardDispatchers = new Dictionary<string, IDispatcher>();
+
+        if (wildcard)
+        {
+            wildcardDispatchers.Add(routingKey, dispatcher);
+        }
+        else
+        {
+            dispatchers.Add(routingKey, dispatcher);
+        }
+
         var body = "test body"u8.ToArray();
         var eventArgs = new BasicDeliverEventArgs
         {
-            RoutingKey = routingKey,
+            RoutingKey = publishingKey,
             Body = body,
             Exchange = "MyExchange",
             DeliveryTag = 1,
@@ -98,19 +110,23 @@ public class BrerListenerTest
             .Returns(Task.FromException(exception));
 
 
-        var listener = new BrerListener(_context, dispatchers, new Dictionary<string, IDispatcher>());
+        var listener = new BrerListener(_context, dispatchers, wildcardDispatchers);
         // set up the channel
         listener.StartListening();
 
         // Act
-        InvokeProcessEvent(listener, dispatcher, eventArgs);
+        InvokeProcessEvent(listener, eventArgs);
 
         // Assert
-
+        // given the nature of our fire and forget method if we don't wait for a little bit here the test
+        // results aren't consistent
+        await Task.Delay(500);
+        _logger.Received(1).Log(LogLevel.Information,
+            $"Received event on exchange MyExchange with routing key {publishingKey}. Consumer tag: (null)");
         // Verify that BasicPublish was called with the expected arguments
         _channel.Received(1).BasicPublish(
             "MyExchange", // Expected exchange name
-            routingKey, // Expected routing key
+            publishingKey, // Expected routing key
             Arg.Any<bool>(),
             Arg.Is<IBasicProperties>(x =>
                 (string) x.Headers["x-Brer-Exception-StackTrace"] == exception.StackTrace &&
@@ -122,57 +138,76 @@ public class BrerListenerTest
 
         _channel.Received(1).BasicAck(eventArgs.DeliveryTag, false);
         _logger.Received(1).Log(LogLevel.Error, exception,
-            $"Failed to handle event on exchange MyExchange with routing key {routingKey}. Consumer tag: (null)");
+            $"Failed to handle event on exchange MyExchange with routing key {publishingKey}. Consumer tag: (null)");
     }
-    
-    
-    
+
+
     [Theory]
-    [InlineData("test.topic")]
-    [InlineData("test.#")]
-    public async Task EventReceived_Should_Ack_When_Handler_Success(string routingKey)
+    [InlineData("test.topic", "test.topic", false)]
+    [InlineData("test.#", "test.topic", true)]
+    public async Task EventReceived_Should_Ack_When_Handler_Success(string routingKey, string publishingKey,
+        bool wildcard)
     {
         // Arrange
         var dispatcher = Substitute.For<IDispatcher>();
-        var dispatchers = new Dictionary<string, IDispatcher> {{"test.topic", dispatcher}};
+        var dispatchers = new Dictionary<string, IDispatcher>();
+        var wildcardDispatchers = new Dictionary<string, IDispatcher>();
+
+        if (wildcard)
+        {
+            wildcardDispatchers.Add(routingKey, dispatcher);
+        }
+        else
+        {
+            dispatchers.Add(routingKey, dispatcher);
+        }
+
         var body = "test body"u8.ToArray();
         var eventArgs = new BasicDeliverEventArgs
         {
-            RoutingKey = routingKey,
+            RoutingKey = publishingKey,
             Body = body,
             Exchange = "MyExchange",
             DeliveryTag = 1,
             BasicProperties = Substitute.For<IBasicProperties>()
         };
-        
+
         // Configure the dispatcher to throw an exception when Dispatch is called
         dispatcher.Dispatch(Arg.Any<BasicDeliverEventArgs>())
             .Returns(Task.CompletedTask);
 
 
-        var listener = new BrerListener(_context, dispatchers, new Dictionary<string, IDispatcher>());
+        var listener = new BrerListener(_context, dispatchers, wildcardDispatchers);
         // set up the channel
         listener.StartListening();
 
         // Act
-        InvokeProcessEvent(listener, dispatcher, eventArgs);
+        InvokeProcessEvent(listener, eventArgs);
 
         // Assert
+        // given the nature of our fire and forget method if we don't wait for a little bit here the test
+        // results aren't consistent
+        await Task.Delay(500);
+        _logger.Received(1).Log(LogLevel.Information,
+            $"Received event on exchange MyExchange with routing key {publishingKey}. Consumer tag: (null)");
+
         _channel.Received(0).BasicPublish(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(),
             Arg.Any<IBasicProperties>(), Arg.Any<ReadOnlyMemory<byte>>());
 
+        _logger.Received(1).Log(LogLevel.Information,
+            $"Handled event on exchange MyExchange with routing key {publishingKey}. Consumer tag: (null)");
+
         _channel.Received(1).BasicAck(eventArgs.DeliveryTag, false);
-        _logger.Received(1).Log(LogLevel.Information, $"Handled event on exchange MyExchange with routing key {routingKey}. Consumer tag: (null)");
     }
 
-    private void InvokeProcessEvent(BrerListener listener, IDispatcher dispatcher, BasicDeliverEventArgs eventArgs)
+    private void InvokeProcessEvent(BrerListener listener, BasicDeliverEventArgs eventArgs)
     {
         // Use reflection to invoke the private method ProcessEvent
-        var method = typeof(BrerListener).GetMethod("ProcessEvent",
+        var method = typeof(BrerListener).GetMethod("EventReceived",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        method?.Invoke(listener, [dispatcher, eventArgs]);
+        method?.Invoke(listener, [null, eventArgs]);
     }
-    
+
 
     // TODO: potentially look into spinning up an integration test for Receiving events.
 }

@@ -40,7 +40,7 @@ internal class ListenerDispatcher : IDispatcher
         if (_method.ReturnType == typeof(Task))
         {
             var task = (Task) _method.Invoke(instance, new[] {param})!;
-            await task!;
+            await task;
         }
         else
         {
