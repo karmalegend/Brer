@@ -118,9 +118,23 @@ public class MyEventPublisher{
 }
 ```
 
+## Error handling.
+Brer currently does not support DLX or 'poison queues' brer does however add some message headers to give insights into
+exceptions and requeue counts.
+
+These headers are:
+* x-Brer-Exception
+* x-Brer-Exception-Message
+* x-Brer-Exception-StackTrace
+* x-Brer-RequeueCount
+
+Using these headers, you could add your own DLX / poison queue logic f.e. by checking the requeue count and if it's above
+3 sending it to a poison queue. Just make sure you preserve the other headers, to make debugging & tracing a lot easier.
+
 
 # I want to contribute!
-As of now we'd greatly appreciate more Example projects & unit-testing of the library.
+As of now we'd greatly appreciate adding support for different exchange types. And adding dlx support 
+/ requeue-ing messages from a dlx.
 
 notes: 
 - No global usings
