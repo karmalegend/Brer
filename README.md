@@ -13,6 +13,7 @@ __Special thanks to Marco Pil__
       - [Handler](#handler)
       - [WildCardHandler](#wildcardhandler)
   - [Publishing events.](#publishing-events)
+  - [Error handling.](#error-handling)
 - [I want to contribute!](#i-want-to-contribute)
 - [I'm missing a feature!](#im-missing-a-feature)
 
