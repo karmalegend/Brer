@@ -45,9 +45,9 @@ namespace MVCListenerHostedService.Controllers
             Console.WriteLine(_testInjection.TestInjectionString());
             Console.WriteLine("KlantGeregistreerdEvent event ontvangen!");
             Console.WriteLine($"\t - KlantNummer: {evt.KlantNummer}");
-            throw new AggregateException();
+            throw new InvalidCastException();
         }
-
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

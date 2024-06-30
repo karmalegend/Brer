@@ -21,16 +21,17 @@ internal sealed class BrerListener : IBrerListener
     private readonly string[] _topics;
     private IModel? _channel;
 
-    public BrerListener(IBrerContext context, Dictionary<string, IDispatcher> dispatchers, Dictionary<string,IDispatcher> wildCardDispatchers)
+    public BrerListener(IBrerContext context, Dictionary<string, IDispatcher> dispatchers,
+        Dictionary<string, IDispatcher> wildCardDispatchers)
     {
         _context = context;
         _dispatchers = dispatchers;
         _wildCardDispatchers = wildCardDispatchers;
-        
+
         _topics = _dispatchers.Keys.Concat(_wildCardDispatchers.Keys).ToArray();
     }
 
-    
+
     public IBrerListener StartListening()
     {
         _channel = _context.Connection.CreateModel();
@@ -38,7 +39,8 @@ internal sealed class BrerListener : IBrerListener
         _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false);
         foreach (var topic in _topics)
         {
-            _context.Logger.LogInformation("Start Listening on queue {BrerQueue}, exchange {BrerExchange}, topic {BerTopic}",
+            _context.Logger.LogInformation(
+                "Start Listening on queue {BrerQueue}, exchange {BrerExchange}, topic {BerTopic}",
                 _context.BrerOptions.QueueName, _context.BrerOptions.ExchangeName, topic);
             _channel.QueueBind(queue: _context.BrerOptions.QueueName, exchange: _context.BrerOptions.ExchangeName,
                 routingKey: topic);
@@ -58,42 +60,85 @@ internal sealed class BrerListener : IBrerListener
 
     private void EventReceived(object? sender, BasicDeliverEventArgs e)
     {
-        _context.Logger.LogInformation("Received event on exchange {BrerExchange} with routingkey {BrerRoutingKey}. Consumertag : {BerConsumerTag}",
+        _context.Logger.LogInformation(
+            "Received event on exchange {BrerExchange} with routing key {BrerRoutingKey}. Consumer tag: {BrerConsumerTag}",
             e.Exchange, e.RoutingKey, e.ConsumerTag);
+
+        var topic = e.RoutingKey;
+        if (_dispatchers.TryGetValue(topic, out var dispatcher))
+        {
+            FireAndForget(async () => await ProcessEvent(dispatcher, e));
+        }
+        else
+        {
+            var wildCardDispatcherTopic = _wildCardDispatchers.Keys.First(x => Regex.IsMatch(topic, x));
+            FireAndForget(async () => await ProcessEvent(_wildCardDispatchers[wildCardDispatcherTopic], e));
+        }
+    }
+
+    private async Task ProcessEvent(IDispatcher dispatcher, BasicDeliverEventArgs e)
+    {
         try
         {
-            var topic = e.RoutingKey;
-            if (_dispatchers.TryGetValue(topic, out var dispatcher))
-            {
-                var dispatcherTask = Task.Run(() => dispatcher.Dispatch(e));
-                dispatcherTask.Wait();
-            }
-            else
-            {
-                var wildCardDispatcherTopic = _wildCardDispatchers.Keys.First(x => Regex.IsMatch(topic, x));
-                _wildCardDispatchers[wildCardDispatcherTopic].Dispatch(e);
-            }
-            
-
-            //only acknowledge when dispatch has successfully finished.
+            await dispatcher.Dispatch(e);
             _channel?.BasicAck(e.DeliveryTag, false);
-            _context.Logger.LogInformation("Handled event on exchange {BrerExchange} with routingkey {BrerRoutingKey }. Consumertag : {BrerConsumerTag }",
+            _context.Logger.LogInformation(
+                "Handled event on exchange {BrerExchange} with routing key {BrerRoutingKey}. Consumer tag: {BrerConsumerTag}",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
         }
         catch (Exception exception)
         {
-            // This puts the message back in the Queue
-            // Note that if the event is somehow malformed or there's flawed logic in the application
-            // this will infinitely add the message back to the queue.
-            // this is ONLY meant to happen when a service breaking exception occurs.
-            // rendering it unable to re-pop items from the queue.
-            _channel?.BasicNack(e.DeliveryTag, false, true);
             _context.Logger.LogError(exception,
-                "Failed to handle event on exchange {BrerExchange} with routingkey {BrerRoutingKey}. Consumertag : {BrerConsumerTag}",
+                "Failed to handle event on exchange {BrerExchange} with routing key {BrerRoutingKey}. Consumer tag: {BrerConsumerTag}",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
+            
+            var headers = GenerateHeaders(e, exception);
+
+            _channel?.BasicPublish(e.Exchange, e.RoutingKey, headers, e.Body);
+            _channel?.BasicAck(e.DeliveryTag, false);
         }
     }
-    
+
+    private IBasicProperties? GenerateHeaders(BasicDeliverEventArgs e, Exception exception)
+    {
+        var requeueCount = 1;
+
+        if (e.BasicProperties.Headers != null && e.BasicProperties.Headers.TryGetValue("x-Brer-RequeueCount", out var requeueCountObject) &&
+            requeueCountObject != null)
+        {
+            requeueCount = Convert.ToInt32(requeueCountObject);
+            requeueCount += 1;
+        }
+
+        var props = _channel?.CreateBasicProperties();
+        if (props != null)
+        {
+            props.Headers = new Dictionary<string, object>
+            {
+                {"x-Brer-Exception", exception.GetType().ToString()},
+                {"x-Brer-Exception-Message", exception.Message},
+                {"x-Brer-Exception-StackTrace", exception.StackTrace ?? string.Empty},
+                {"x-Brer-RequeueCount", requeueCount}
+            };
+        }
+
+        return props;
+    }
+
+    private void FireAndForget(Func<Task> taskFunc)
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                await taskFunc();
+            }
+            catch (Exception ex)
+            {
+                _context.Logger.LogError(ex, "Error in FireAndForget task");
+            }
+        });
+    }
     
     private void TransformWildCardKeys()
     {
@@ -101,8 +146,8 @@ internal sealed class BrerListener : IBrerListener
         var keys = _wildCardDispatchers.Keys.ToArray();
         foreach (var key in keys)
         {
-            var pattern = key.Replace(".","\\.").Replace("*", @"\w+").Replace("#","[\\w\\.]+");
-            _wildCardDispatchers.RenameKey(key,pattern);
+            var pattern = key.Replace(".", "\\.").Replace("*", @"\w+").Replace("#", "[\\w\\.]+");
+            _wildCardDispatchers.RenameKey(key, pattern);
         }
     }
 

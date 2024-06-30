@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCListenerHostedService", "MvcExample\MVCListenerHostedService.csproj", "{876477E5-DE1D-4763-BA5A-8BACE027FAF7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brer", "..\Brer\Brer\Brer.csproj", "{694BFE7A-CBBA-46C9-AB25-2B9FA12D0A66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{876477E5-DE1D-4763-BA5A-8BACE027FAF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{876477E5-DE1D-4763-BA5A-8BACE027FAF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{876477E5-DE1D-4763-BA5A-8BACE027FAF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{694BFE7A-CBBA-46C9-AB25-2B9FA12D0A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{694BFE7A-CBBA-46C9-AB25-2B9FA12D0A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{694BFE7A-CBBA-46C9-AB25-2B9FA12D0A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{694BFE7A-CBBA-46C9-AB25-2B9FA12D0A66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

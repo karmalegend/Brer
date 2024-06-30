@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
+using System.Threading.Tasks;
 using Brer.Listener.Runtime.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -24,18 +26,25 @@ internal class ListenerDispatcher : IDispatcher
         _serviceProvider = serviceProvider;
     }
 
-    public void Dispatch(BasicDeliverEventArgs e)
+    public async Task Dispatch(BasicDeliverEventArgs e)
     {
         var param = JsonConvert.DeserializeObject(
             Encoding.Unicode.GetString(e.Body.ToArray()),
             _parameterType);
 
         using var scope = _serviceProvider.CreateScope();
-        
+
         var instance = ActivatorUtilities.GetServiceOrCreateInstance(
             scope.ServiceProvider, _eventListenerType);
 
-        // since we don't have logging yet an exception should be thrown.
-        _method.Invoke(instance, new[] {param});
+        if (_method.ReturnType == typeof(Task))
+        {
+            var task = (Task) _method.Invoke(instance, new[] {param})!;
+            await task!;
+        }
+        else
+        {
+            _method.Invoke(instance, new[] {param});
+        }
     }
 }
