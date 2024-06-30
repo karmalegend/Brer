@@ -43,12 +43,12 @@ Brer can also be configured using environment variables as follows:
 services.UseBrer(new BrerOptionsBuilder().ReadFromEnviromentVariables().Build());
 ```
 Where it will look for the following variables:
-* BrerHostName
-* BrerPort
-* BrerExchangeName
-* BrerQueueName
-* BrerUserName
-* BrerPassword
+* `BrerHostName`
+* `BrerPort`
+* `BrerExchangeName`
+* `BrerQueueName`
+* `BrerUserName`
+* `BrerPassword`
 
 
 ## Registering/Decorating an EventListener
@@ -124,10 +124,10 @@ Brer currently does not support DLX or 'poison queues' brer does however add som
 exceptions and requeue counts.
 
 These headers are:
-* x-Brer-Exception
-* x-Brer-Exception-Message
-* x-Brer-Exception-StackTrace
-* x-Brer-RequeueCount
+* `x-Brer-Exception`
+* `x-Brer-Exception-Message`
+* `x-Brer-Exception-StackTrace`
+* `x-Brer-RequeueCount`
 
 Using these headers, you could add your own DLX / poison queue logic f.e. by checking the requeue count and if it's above
 3 sending it to a poison queue. Just make sure you preserve the other headers, to make debugging & tracing a lot easier.
