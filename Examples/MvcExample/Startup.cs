@@ -25,7 +25,7 @@ namespace MVCListenerHostedService
             services.UseBrer(
                 new BrerOptionsBuilder().WithAddress(BrerOptionsBuilder.LocalHost, BrerOptionsBuilder.DefaultPort)
                     .WithPassword(BrerOptionsBuilder.DefaultLogin)
-                    .WithUserName(BrerOptionsBuilder.DefaultLogin)
+                    .WithUsername(BrerOptionsBuilder.DefaultLogin)
                     .WithExchange("MyExchange")
                     .WithQueueName("MyQueue")
                     .Build()
