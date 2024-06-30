@@ -5,11 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-<!--        <PackageReference Include="Brer" Version="1.0.13" />-->
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Brer\Brer\Brer.csproj" />
+        <PackageReference Include="Brer" Version="1.0.13" />
     </ItemGroup>
     
 
