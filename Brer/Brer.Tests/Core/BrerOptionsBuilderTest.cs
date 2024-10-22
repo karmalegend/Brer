@@ -92,6 +92,7 @@ public class BrerOptionsBuilderTest
         Environment.SetEnvironmentVariable("BrerQueueName", "Queue", EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("BrerUserName", "guest", EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("BrerPassword", "guest", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerMaxRetries", null, EnvironmentVariableTarget.Process);
 
 
         // Act
