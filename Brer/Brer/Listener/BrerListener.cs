@@ -36,7 +36,14 @@ internal sealed class BrerListener : IBrerListener
     {
         _channel = _context.Connection.CreateModel();
         _channel.ExchangeDeclare(exchange: _context.BrerOptions.ExchangeName, type: ExchangeType.Topic);
-        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false);
+        
+         var arguments = new Dictionary<string, object>
+         {
+             {"x-dead-letter-exchange", _context.BrerOptions.ExchangeName + "-dlx"},
+             {"x-dead-letter-routing-key", _context.BrerOptions.QueueName + "-dlx"}
+         };
+
+        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false,arguments);
         foreach (var topic in _topics)
         {
             _context.Logger.LogInformation(
