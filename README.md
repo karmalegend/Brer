@@ -145,7 +145,8 @@ or use ```WithMaxRetries(5)``` Brer does not try to infer any dlx naming or allo
 
 It will always use the provided exchange and queue name for dlx routing f.e.:
 
-**important** to note Brer will create the (persistent) queue for you but __*NOT*__ the exchange
+**important** to note Brer will create the (persistent) queue for you but __*NOT*__ the exchange if you do not make sure
+the Exchange exists before-hand messages will silently be dropped.
 
 | Brer Variable    | Name                | DLX Name                | RabbitmqHeader            |
 |------------------|---------------------|-------------------------|---------------------------|
