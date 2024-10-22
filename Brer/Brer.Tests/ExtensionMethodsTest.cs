@@ -20,7 +20,7 @@ public class ExtensionMethodsTest
         // Arrange
         IServiceCollection services = new ServiceCollection();
 
-        var options = new BrerOptions(new ConnectionFactory(), "exchange", "queue");
+        var options = new BrerOptions(new ConnectionFactory(), "exchange", "queue",4);
 
         // Act
         services.UseBrer(options);
