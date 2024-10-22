@@ -36,7 +36,14 @@ internal sealed class BrerListener : IBrerListener
     {
         _channel = _context.Connection.CreateModel();
         _channel.ExchangeDeclare(exchange: _context.BrerOptions.ExchangeName, type: ExchangeType.Topic);
-        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false);
+        
+         var arguments = new Dictionary<string, object>
+         {
+             {"x-dead-letter-exchange", _context.BrerOptions.ExchangeName + "-dlx"},
+             {"x-dead-letter-routing-key", _context.BrerOptions.QueueName + "-dlx"}
+         };
+
+        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false,arguments);
         foreach (var topic in _topics)
         {
             _context.Logger.LogInformation(
@@ -91,6 +98,11 @@ internal sealed class BrerListener : IBrerListener
             _context.Logger.LogError(exception,
                 "Failed to handle event on exchange {BrerExchange} with routing key {BrerRoutingKey}. Consumer tag: {BrerConsumerTag}",
                 e.Exchange, e.RoutingKey, e.ConsumerTag);
+
+            if (_context.BrerOptions.MaxRetries.HasValue && GetRequeueCount(e) > _context.BrerOptions.MaxRetries)
+            {
+                _channel?.BasicNack(e.DeliveryTag,false,false);
+            }
             
             var headers = GenerateHeaders(e, exception);
 
@@ -101,14 +113,6 @@ internal sealed class BrerListener : IBrerListener
 
     private IBasicProperties? GenerateHeaders(BasicDeliverEventArgs e, Exception exception)
     {
-        var requeueCount = 1;
-
-        if (e.BasicProperties.Headers != null && e.BasicProperties.Headers.TryGetValue("x-Brer-RequeueCount", out var requeueCountObject) &&
-            requeueCountObject != null)
-        {
-            requeueCount = Convert.ToInt32(requeueCountObject);
-            requeueCount += 1;
-        }
 
         var props = _channel?.CreateBasicProperties();
         if (props != null)
@@ -118,11 +122,25 @@ internal sealed class BrerListener : IBrerListener
                 {"x-Brer-Exception", exception.GetType().ToString()},
                 {"x-Brer-Exception-Message", exception.Message},
                 {"x-Brer-Exception-StackTrace", exception.StackTrace ?? string.Empty},
-                {"x-Brer-RequeueCount", requeueCount}
+                {"x-Brer-RequeueCount", GetRequeueCount(e)}
             };
         }
 
         return props;
+    }
+
+    private static int GetRequeueCount(BasicDeliverEventArgs e)
+    {
+        var requeueCount = 1;
+
+        if (e.BasicProperties.Headers != null && e.BasicProperties.Headers.TryGetValue("x-Brer-RequeueCount", out var requeueCountObject) &&
+            requeueCountObject != null)
+        {
+            requeueCount = Convert.ToInt32(requeueCountObject);
+            requeueCount += 1;
+        }
+
+        return requeueCount;
     }
 
     private void FireAndForget(Func<Task> taskFunc)

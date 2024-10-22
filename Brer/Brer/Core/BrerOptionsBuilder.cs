@@ -16,6 +16,7 @@ public class BrerOptionsBuilder
 
     private string RabbitMqUser { get; set; } = null!;
     private string RabbitMqPass { get; set; } = null!;
+    private int? MaxRetries { get; set; }
 
 
     public BrerOptionsBuilder WithAddress(string host, int port)
@@ -49,6 +50,18 @@ public class BrerOptionsBuilder
         return this;
     }
 
+    /// <summary>
+    /// When this number is hit the message gets nacked Brer assumes you've properly setup a DLX.
+    /// The message gets queued with x-first-death-reason set as rejected.
+    /// </summary>
+    /// <param name="maxRetries"></param>
+    /// <returns></returns>
+    public BrerOptionsBuilder WithMaxRetries(int maxRetries)
+    {
+        MaxRetries = maxRetries;
+        return this;
+    }
+
     public BrerOptionsBuilder ReadFromEnvironmentVariables()
     {
         Host = Environment.GetEnvironmentVariable("BrerHostName") ?? throw new ArgumentNullException(nameof(Host));
@@ -62,6 +75,11 @@ public class BrerOptionsBuilder
                        throw new ArgumentNullException(nameof(RabbitMqUser));
         RabbitMqPass = Environment.GetEnvironmentVariable("BrerPassword") ??
                        throw new ArgumentNullException(nameof(RabbitMqPass));
+        
+        MaxRetries = int.TryParse(Environment.GetEnvironmentVariable("BrerMaxRetries"), out var parsedRetries)
+            ? parsedRetries
+            : null;
+        
         return this;
     }
 
@@ -75,6 +93,7 @@ public class BrerOptionsBuilder
                 Password = RabbitMqPass
             },
             ExchangeName,
-            QueueName);
+            QueueName,
+            MaxRetries);
     }
 }
