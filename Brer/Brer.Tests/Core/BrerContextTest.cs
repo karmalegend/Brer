@@ -18,13 +18,13 @@ public class BrerContextTest
 
         var connectionFactorySub = Substitute.For<IConnectionFactory>();
         var connectionSub = Substitute.For<IConnection>();
-        var modelSub = Substitute.For<IModel>();
+        var modelSub = Substitute.For<IModel>(); 
 
         connectionFactorySub.CreateConnection().Returns(connectionSub);
 
         connectionSub.CreateModel().Returns(modelSub);
 
-        var options = new BrerOptions(connectionFactorySub, "Exchange", "Queue");
+        var options = new BrerOptions(connectionFactorySub, "Exchange", "Queue",null);
 
         // Act
         var res = new BrerContext(options, logger);

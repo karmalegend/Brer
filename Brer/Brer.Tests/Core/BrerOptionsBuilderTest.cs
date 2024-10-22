@@ -24,11 +24,11 @@ public class BrerOptionsBuilderTest
         var expectedOptions =
             new BrerOptions(
                 new ConnectionFactory {Port = 123, HostName = "host", UserName = "user", Password = "password"},
-                ExchangeName: "Exchange", QueueName: "Queue");
+                ExchangeName: "Exchange", QueueName: "Queue",4);
 
         // Act
         var res = _sut.WithAddress(host: "host", port: 123).WithExchange("Exchange")
-            .WithQueueName("Queue").WithUsername("user").WithPassword("password").Build();
+            .WithQueueName("Queue").WithUsername("user").WithPassword("password").WithMaxRetries(4).Build();
 
         // Assert
         res.Should().BeEquivalentTo(expectedOptions);
@@ -41,12 +41,12 @@ public class BrerOptionsBuilderTest
         var expectedOptions =
             new BrerOptions(
                 new ConnectionFactory {Port = 5672, HostName = "localhost", UserName = "guest", Password = "guest"},
-                ExchangeName: "Exchange", QueueName: "Queue");
+                ExchangeName: "Exchange", QueueName: "Queue",4);
 
         // Act
         var res = _sut.WithAddress(host: BrerOptionsBuilder.LocalHost, BrerOptionsBuilder.DefaultPort)
             .WithPassword(BrerOptionsBuilder.DefaultLogin).WithUsername(BrerOptionsBuilder.DefaultLogin)
-            .WithExchange("Exchange").WithQueueName("Queue").Build();
+            .WithExchange("Exchange").WithQueueName("Queue").WithMaxRetries(4).Build();
 
         // Assert
         res.Should().BeEquivalentTo(expectedOptions);
@@ -59,7 +59,32 @@ public class BrerOptionsBuilderTest
         var expectedOptions =
             new BrerOptions(
                 new ConnectionFactory {Port = 5672, HostName = "localhost", UserName = "guest", Password = "guest"},
-                ExchangeName: "Exchange", QueueName: "Queue");
+                ExchangeName: "Exchange", QueueName: "Queue",4);
+
+        Environment.SetEnvironmentVariable("BrerHostName", "Host", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerPort", "5672", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerExchangeName", "Exchange", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerQueueName", "Queue", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerUserName", "guest", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerPassword", "guest", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BrerMaxRetries", "4", EnvironmentVariableTarget.Process);
+
+
+        // Act
+        var res = _sut.ReadFromEnvironmentVariables().Build();
+
+        // Assert
+        res.Should().BeEquivalentTo(expectedOptions);
+    }
+    
+    [Fact]
+    public void ReadFromEnvironmentVariables_Should_Read_Max_Retries_As_Null_When_Not_Present()
+    {
+        // Arrange
+        var expectedOptions =
+            new BrerOptions(
+                new ConnectionFactory {Port = 5672, HostName = "localhost", UserName = "guest", Password = "guest"},
+                ExchangeName: "Exchange", QueueName: "Queue",null);
 
         Environment.SetEnvironmentVariable("BrerHostName", "Host", EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("BrerPort", "5672", EnvironmentVariableTarget.Process);

@@ -33,7 +33,7 @@ public class BrerListenerTest
 
         _context.Logger.Returns(_logger);
         _context.Connection.Returns(_connection);
-        _context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), "MyExchange", "MyQueue"));
+        _context.BrerOptions.Returns(new BrerOptions(Substitute.For<IConnectionFactory>(), "MyExchange", "MyQueue",10));
         _connection.CreateModel().Returns(_channel);
     }
 
