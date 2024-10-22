@@ -63,7 +63,7 @@ public class BrerListenerTest
         // Assert
         _ = _context.Received(1).Connection;
         _channel.Received(1).ExchangeDeclare("MyExchange", ExchangeType.Topic);
-        _channel.Received(1).QueueDeclare("MyQueue", true, false, false);
+        _channel.Received(1).QueueDeclare("MyQueue", true, false, false, Arg.Any<Dictionary<string,object>>());
         _logger.Received(1).Log(LogLevel.Information,
             "Start Listening on queue MyQueue, exchange MyExchange, topic eventKey");
         _channel.Received(1).QueueBind("MyQueue", "MyExchange", "eventKey");
@@ -72,6 +72,37 @@ public class BrerListenerTest
         wildcardDispatchers.Keys.Should().Contain(@"eventKey\.[\w\.]+");
         wildcardDispatchers.Keys.Should().Contain(@"eventKey\.\w+");
         res.Should().BeOfType<BrerListener>();
+    }
+    
+    
+    [Fact]
+    public void StartListening_Should_Register_Queue_With_DLX_Headers()
+    {
+        // Arrange
+        Dictionary<string, object> capturedArguments = null;
+        
+        _channel.QueueDeclare(
+            "MyQueue",
+            true,
+            false,
+            false,
+            Arg.Do<Dictionary<string, object>>(x => capturedArguments = new Dictionary<string, object>(x))
+        );
+        
+
+        var dispatchers = new Dictionary<string, IDispatcher>();
+
+        var wildcardDispatchers = new Dictionary<string, IDispatcher>();
+
+        var sut = new BrerListener(_context, dispatchers, wildcardDispatchers);
+
+        // Act
+        _ = sut.StartListening();
+        
+        // Assert
+        capturedArguments.Should().ContainKey("x-dead-letter-exchange").WhoseValue.Should().Be("MyExchange-dlx");
+        capturedArguments.Should().ContainKey("x-dead-letter-routing-key").WhoseValue.Should().Be("MyQueue-dlx");
+        
     }
 
     [Theory]
