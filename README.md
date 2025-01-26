@@ -127,9 +127,7 @@ public class MyEventPublisher{
 ```
 
 ## Error handling.
-
-Brer currently does not support DLX or 'poison queues' brer does however add some message headers to give insights into
-exceptions and requeue counts.
+Brer adds some message headers to give insights into exceptions and requeue counts.
 
 These headers are:
 
@@ -138,6 +136,8 @@ These headers are:
 * `x-Brer-Exception-StackTrace`
 * `x-Brer-RequeueCount`
 
+Note: that these get overwritten if an error gets thrown again whilst re-processing.
+
 ### DLX (Dead Letter Exchange) / Poison Queue
 
 Brer can be configured to send messages to a DLX one can either provide the env var `BrerMaxRetries` when using env vars
@@ -145,8 +145,8 @@ or use ```WithMaxRetries(5)``` Brer does not try to infer any dlx naming or allo
 
 It will always use the provided exchange and queue name for dlx routing f.e.:
 
-**important** to note Brer will create the (persistent) queue for you but __*NOT*__ the exchange if you do not make sure
-the Exchange exists before-hand messages will silently be dropped.
+**important** to note Brer will create the (persistent) queue for you but __*AND*__ the exchange if you do not make sure
+the user has correct permissions before-hand messages will be dropped.
 
 | Brer Variable    | Name                | DLX Name                | RabbitmqHeader            |
 |------------------|---------------------|-------------------------|---------------------------|

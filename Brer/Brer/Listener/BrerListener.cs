@@ -36,14 +36,8 @@ internal sealed class BrerListener : IBrerListener
     {
         _channel = _context.Connection.CreateModel();
         _channel.ExchangeDeclare(exchange: _context.BrerOptions.ExchangeName, type: ExchangeType.Topic);
-        
-         var arguments = new Dictionary<string, object>
-         {
-             {"x-dead-letter-exchange", _context.BrerOptions.ExchangeName + "-dlx"},
-             {"x-dead-letter-routing-key", _context.BrerOptions.QueueName + "-dlx"}
-         };
-
-        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false,arguments);
+        var arguments = SetupDlx();
+        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName, true, false, false, arguments);
         foreach (var topic in _topics)
         {
             _context.Logger.LogInformation(
@@ -101,9 +95,10 @@ internal sealed class BrerListener : IBrerListener
 
             if (_context.BrerOptions.MaxRetries.HasValue && GetRequeueCount(e) > _context.BrerOptions.MaxRetries)
             {
-                _channel?.BasicNack(e.DeliveryTag,false,false);
+                _channel?.BasicNack(e.DeliveryTag, false, false);
+                return;
             }
-            
+
             var headers = GenerateHeaders(e, exception);
 
             _channel?.BasicPublish(e.Exchange, e.RoutingKey, headers, e.Body);
@@ -113,7 +108,6 @@ internal sealed class BrerListener : IBrerListener
 
     private IBasicProperties? GenerateHeaders(BasicDeliverEventArgs e, Exception exception)
     {
-
         var props = _channel?.CreateBasicProperties();
         if (props != null)
         {
@@ -133,7 +127,8 @@ internal sealed class BrerListener : IBrerListener
     {
         var requeueCount = 1;
 
-        if (e.BasicProperties.Headers != null && e.BasicProperties.Headers.TryGetValue("x-Brer-RequeueCount", out var requeueCountObject) &&
+        if (e.BasicProperties.Headers != null &&
+            e.BasicProperties.Headers.TryGetValue("x-Brer-RequeueCount", out var requeueCountObject) &&
             requeueCountObject != null)
         {
             requeueCount = Convert.ToInt32(requeueCountObject);
@@ -157,7 +152,7 @@ internal sealed class BrerListener : IBrerListener
             }
         });
     }
-    
+
     private void TransformWildCardKeys()
     {
         _context.Logger.LogInformation("Transforming wildcard keys into pattern");
@@ -167,6 +162,24 @@ internal sealed class BrerListener : IBrerListener
             var pattern = key.Replace(".", "\\.").Replace("*", @"\w+").Replace("#", "[\\w\\.]+");
             _wildCardDispatchers.RenameKey(key, pattern);
         }
+    }
+
+    private Dictionary<string, object> SetupDlx()
+    {
+        var arguments = new Dictionary<string, object>();
+        
+        if (!_context.BrerOptions.MaxRetries.HasValue) return arguments;
+        
+        arguments.Add("x-dead-letter-exchange", _context.BrerOptions.ExchangeName + "-dlx");
+        arguments.Add("x-dead-letter-routing-key", _context.BrerOptions.QueueName + "-dlx");
+        _channel.ExchangeDeclare(exchange: _context.BrerOptions.ExchangeName + "-dlx", type: ExchangeType.Topic);
+        _channel.QueueDeclare(queue: _context.BrerOptions.QueueName + "-dlx", durable: true, exclusive: false,
+            autoDelete: false);
+        _channel.QueueBind(queue: _context.BrerOptions.QueueName + "-dlx",
+            exchange: _context.BrerOptions.ExchangeName + "-dlx", routingKey: _context.BrerOptions.QueueName + "-dlx");
+        
+        return arguments;
+        
     }
 
     public void Dispose()
