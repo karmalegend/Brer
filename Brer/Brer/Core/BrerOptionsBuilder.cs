@@ -51,7 +51,7 @@ public class BrerOptionsBuilder
     }
 
     /// <summary>
-    /// When this number is hit the message gets nacked Brer assumes you've properly setup a DLX.
+    /// When this number is hit, the message gets nacked Brer creates the DLX exchange and queue according to the readme
     /// The message gets queued with x-first-death-reason set as rejected.
     /// </summary>
     /// <param name="maxRetries"></param>
