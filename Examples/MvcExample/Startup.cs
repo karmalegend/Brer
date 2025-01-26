@@ -28,6 +28,7 @@ namespace MVCListenerHostedService
                     .WithUsername(BrerOptionsBuilder.DefaultLogin)
                     .WithExchange("MyExchange")
                     .WithQueueName("MyQueue")
+                    .WithMaxRetries(3)
                     .Build()
                 );
         }
